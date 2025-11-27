@@ -1,0 +1,18 @@
+# Jupyter kernel for VS Code
+jupyter>=1.0.0
+ipykernel>=6.25.0
+
+# Data manipulation and analysis
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Machine learning frameworks
+torch>=2.0.0
+torchvision>=0.15.0
+tensorflow>=2.13.0
+
+# Image processing
+Pillow>=10.0.0
