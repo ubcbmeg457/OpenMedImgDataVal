@@ -3,7 +3,7 @@ name = "openmedimgdataval"
 version = "0.1.0"
 description = "Context-Aware and Efficient Data Valuation for Medical Machine Learning"
 readme = "README.md"
-requires-python = "==3.11.13"
+requires-python = ">=3.11,<3.12"
 dependencies = [
     "ruff==0.14.10",
     "pre-commit==3.6.0",
