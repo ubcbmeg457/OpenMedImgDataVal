@@ -1,5 +1,5 @@
 [project]
-name = "OpenMedImgDataVal"
+name = "openmedimgdataval"
 version = "0.1.0"
 description = "Context-Aware and Efficient Data Valuation for Medical Machine Learning"
 readme = "README.md"
