@@ -1,0 +1,17 @@
+[project]
+name = "prototype"
+version = "0.1.0"
+description = "A prototype"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.25.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "tensorflow>=2.13.0",
+    "Pillow>=10.0.0",
+]

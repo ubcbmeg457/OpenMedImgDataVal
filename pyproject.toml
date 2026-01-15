@@ -1,3 +1,6 @@
+[tool.uv.workspace]
+members = ["prototype"]
+
 [project]
 name = "openmedimgdataval"
 version = "0.1.0"
@@ -24,3 +27,4 @@ select = [
     "I",    # isort
     "N",    # pep8-naming
 ]
+ignore = ["N812"]
