@@ -51,16 +51,19 @@ wheels = [
 name = "openmedimgdataval"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
+
+[package.optional-dependencies]
+dev = [
     { name = "pre-commit" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "pre-commit", specifier = "==3.6.0" },
-    { name = "ruff", specifier = "==0.14.10" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = "==3.6.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.14.10" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "platformdirs"
