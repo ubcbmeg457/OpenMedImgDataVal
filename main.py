@@ -1,6 +1,6 @@
-def print_hello_world():
-    print("hello world!")
+def print_setup_success():
+    print("Project setup success!")
 
 
 if __name__ == "__main__":
-    print_hello_world()
+    print_setup_success()

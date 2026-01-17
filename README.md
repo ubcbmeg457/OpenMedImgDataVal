@@ -1,21 +1,5 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
 
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -23,28 +7,24 @@
 [![MIT License][license-shield]][license-url]
 
 # Open Medical Imaging Data Valuation
+
 <div align="center">
   <a href="https://github.com/rsingla92/OpenMedImgDataVal">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
-
   <h3 align="center">Open Medical Imaging Data Valuation</h3>
-
   <p align="center">
     Is a picture worth a thousand well-curated training samples?  
     <br />
-    <a href="https://github.com/rsingla92/OpenMedImgDataVa/docs"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/rsingla92/OpenMedImgDataVal/docs"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/rsingla92/OpenMedImgDataVal/examples">View Examples</a>
-    ·
     <a href="https://github.com/rsingla92/OpenMedImgDataVal/issues">Report Bug</a>
-    ·
     <a href="https://github.com/rsingla92/OpenMedImgDataVal/issues">Request Feature</a>
   </p>
 </div>
 
-<!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -72,7 +52,6 @@
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 Training data is the foundation of machine learning, yet not all data points are created equal. As models saturate in performance and as noisy or AI-generated content (“AI slop”) proliferates, the need for **principled methods to quantify the value of individual samples** is more pressing than ever. 
 
@@ -89,9 +68,9 @@ Ultimately, this project is about enabling **better models with less data** with
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Built With
+### Technologies
 
-Core stack and libraries we use include:  
+Core stack and libraries we use include:
 
 * [PyTorch](https://pytorch.org/) for deep learning  
 * [NumPy](https://numpy.org/) & [SciPy](https://scipy.org/) for numerical computation  
@@ -100,33 +79,38 @@ Core stack and libraries we use include:
 * [Giotto-TDA](https://giotto-ai.github.io/gtda-docs/) for topological data analysis  
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
 ## Getting Started
-This is an example of how you may give instructions on setting up your project locally. To get a local copy up and running follow these simple example steps.
 
-### Prerequisites
-We recommend Python 3.9+ with a GPU-enabled PyTorch installation.  
+These steps assume your machine runs macOS and you have [Homebrew](https://brew.sh/) installed.
+
+1. Clone project:
 
 ```sh
-pip install torch torchvision torchaudio
-```
-
-Additional dependencies are listed in requirements.txt.
-
-### Installation
-1. Clone the repo:
-```sh
-git clone https://github.com/rsingla92/OpenMedImgDataVal.git
+git clone https://github.com/ubcbmeg457/OpenMedImgDataVal.git
 cd OpenMedImgDataVal
 ```
 
-2. Install dependencies:
+2. Install `uv`:
+
 ```sh
-pip install -r requirements.txt
+brew install uv
 ```
+
+3. Set up project:
+
+```sh
+make setup
+```
+
+4. Test project setup:
+
+```sh
+uv run main.py
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE EXAMPLES -->
+
 ## Usage
 Example: running Shapley value approximations on a toy dataset.
 ```sh
