@@ -16,10 +16,10 @@
   <p align="center">
     Is a picture worth a thousand well-curated training samples?  
     <br />
-    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/docs"><strong>Explore the docs »</strong></a>
+    <a href="docs"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/examples">View Examples</a>
+    <a href="examples">View Examples</a>
     <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Report Bug</a>
     <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Request Feature</a>
   </p>
