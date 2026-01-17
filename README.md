@@ -90,7 +90,7 @@ git clone https://github.com/ubcbmeg457/OpenMedImgDataVal.git
 cd OpenMedImgDataVal
 ```
 
-2. Install `uv`:
+2. Install [`uv`](https://github.com/astral-sh/uv):
 
 ```sh
 brew install uv
