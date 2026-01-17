@@ -72,11 +72,12 @@ Ultimately, this project is about enabling **better models with less data** with
 
 Core stack and libraries we use include:
 
-* [PyTorch](https://pytorch.org/) for deep learning  
-* [NumPy](https://numpy.org/) & [SciPy](https://scipy.org/) for numerical computation  
-* [scikit-learn](https://scikit-learn.org/) for baseline models and utilities  
-* [POT (Python Optimal Transport)](https://pythonot.github.io/) for OT methods  
-* [Giotto-TDA](https://giotto-ai.github.io/gtda-docs/) for topological data analysis  
+* [PyTorch](https://pytorch.org/) for deep learning
+* [NumPy](https://numpy.org/) & [SciPy](https://scipy.org/) for numerical computation
+* [scikit-learn](https://scikit-learn.org/) for baseline models and utilities
+* [POT (Python Optimal Transport)](https://pythonot.github.io/) for OT methods
+* [Giotto-TDA](https://giotto-ai.github.io/gtda-docs/) for topological data analysis
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Getting Started
@@ -90,7 +91,7 @@ git clone https://github.com/ubcbmeg457/OpenMedImgDataVal.git
 cd OpenMedImgDataVal
 ```
 
-2. Install [`uv`](https://github.com/astral-sh/uv):
+2. Install [uv](https://github.com/astral-sh/uv):
 
 ```sh
 brew install uv
