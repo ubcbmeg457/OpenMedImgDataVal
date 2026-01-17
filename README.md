@@ -9,19 +9,19 @@
 # Open Medical Imaging Data Valuation
 
 <div align="center">
-  <a href="https://github.com/rsingla92/OpenMedImgDataVal">
+  <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
   <h3 align="center">Open Medical Imaging Data Valuation</h3>
   <p align="center">
     Is a picture worth a thousand well-curated training samples?  
     <br />
-    <a href="https://github.com/rsingla92/OpenMedImgDataVal/docs"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/docs"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/rsingla92/OpenMedImgDataVal/examples">View Examples</a>
-    <a href="https://github.com/rsingla92/OpenMedImgDataVal/issues">Report Bug</a>
-    <a href="https://github.com/rsingla92/OpenMedImgDataVal/issues">Request Feature</a>
+    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/examples">View Examples</a>
+    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Report Bug</a>
+    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Request Feature</a>
   </p>
 </div>
 
