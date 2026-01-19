@@ -55,7 +55,7 @@ Core stack and libraries we use include:
 
 ## Getting Started
 
-These steps assume your machine runs macOS and you have [Homebrew](https://brew.sh/) installed.
+These steps assume your machine runs macOS and has [Homebrew](https://brew.sh/) installed.
 
 1. Clone project:
 
