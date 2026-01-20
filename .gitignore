@@ -2,3 +2,5 @@
 .ruff_cache/
 *data/
 .vscode/
+*.ipynb_checkpoints/
+
