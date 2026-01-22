@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["prototype"]
+members = ["prototype", "mri-seg"]
 
 [project]
 name = "openmedimgdataval"
