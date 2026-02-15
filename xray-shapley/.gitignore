@@ -10,6 +10,7 @@ data/
 models/
 shap_values/
 data_valuation/
+embeddings/
 
 # Jupyter
 .ipynb_checkpoints/

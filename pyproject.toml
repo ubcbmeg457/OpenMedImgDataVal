@@ -28,4 +28,4 @@ select = [
     "I",    # isort
     "N",    # pep8-naming
 ]
-ignore = ["N812"]
+ignore = ["N812", "N803"]
