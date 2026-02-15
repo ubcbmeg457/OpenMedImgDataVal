@@ -48,7 +48,7 @@ notebook:
 	fi
 	@if [ ! -d "$(MODULE)/.venv" ] && [ ! -d "$(MODULE)/venv" ]; then \
 		echo "Setting up $(MODULE) with uv (dependencies from pyproject.toml)..."; \
-		cd $(MODULE) && uv venv .venv && uv pip install -q numpy pandas scikit-learn torch torchvision xgboost 'shap>=0.48.0' kagglehub Pillow matplotlib seaborn jupyter ipykernel tqdm; \
+		cd $(MODULE) && uv sync; \
 	fi
 	@VENV_DIR=""; if [ -d "$(MODULE)/.venv" ]; then VENV_DIR=".venv"; elif [ -d "$(MODULE)/venv" ]; then VENV_DIR="venv"; fi; \
 	echo "Starting Jupyter for $(MODULE)..."; \
