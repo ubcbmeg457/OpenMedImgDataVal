@@ -42,17 +42,13 @@ notebook:
 		xargs grep -l "name = " | sed 's|^./||; s|/pyproject.toml||' | sort; \
 		exit 1; \
 	fi
-	@if [ ! -d "$(MODULE)/notebooks" ]; then \
-		echo "Error: $(MODULE)/notebooks not found"; \
-		exit 1; \
-	fi
 	@if [ ! -d "$(MODULE)/.venv" ] && [ ! -d "$(MODULE)/venv" ]; then \
 		echo "Setting up $(MODULE) with uv (dependencies from pyproject.toml)..."; \
 		cd $(MODULE) && uv sync; \
 	fi
 	@VENV_DIR=""; if [ -d "$(MODULE)/.venv" ]; then VENV_DIR=".venv"; elif [ -d "$(MODULE)/venv" ]; then VENV_DIR="venv"; fi; \
 	echo "Starting Jupyter for $(MODULE)..."; \
-	cd $(MODULE) && source $$VENV_DIR/bin/activate && jupyter notebook notebooks/
+	cd $(MODULE) && source $$VENV_DIR/bin/activate
 
 # Convenience shortcuts for known modules
 .PHONY: notebook-xray-shapley
