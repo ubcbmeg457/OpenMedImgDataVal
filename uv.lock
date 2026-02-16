@@ -2426,6 +2426,7 @@ dependencies = [
     { name = "shap" },
     { name = "torch" },
     { name = "torchvision" },
+    { name = "tqdm" },
     { name = "xgboost" },
 ]
 
@@ -2444,5 +2445,6 @@ requires-dist = [
     { name = "shap", specifier = ">=0.48.0" },
     { name = "torch", specifier = ">=2.0.0" },
     { name = "torchvision", specifier = ">=0.15.0" },
+    { name = "tqdm", specifier = ">=4.65.0" },
     { name = "xgboost", specifier = ">=2.0.0" },
 ]
