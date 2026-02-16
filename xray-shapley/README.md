@@ -39,20 +39,14 @@ Stage 2: Data Valuation
 
 ```
 xray-shapley/
-├── data/
-│   ├── raw/              # Downloaded Kaggle dataset (git-ignored)
-│   └── features/         # Cached CNN embeddings
-├── models/               # Trained XGBoost models
-├── shap_values/          # Computed SHAP values
-├── data_valuation/       # Data Shapley results and analysis
-├── notebooks/
-│   ├── 01_data_download.ipynb        # Dataset acquisition
-│   ├── 02_feature_extraction.ipynb   # CNN feature extraction
-│   ├── 03_model_training.ipynb       # XGBoost training
-│   ├── 04_shap_analysis.ipynb        # Feature-level SHAP
-│   └── 05_data_valuation.ipynb       # Data-level Shapley values (CORE)
+├── xray_shapley.ipynb            # Complete unified pipeline (data → valuation)
 ├── pyproject.toml
-└── README.md (this file)
+├── README.md
+├── data/                          # Downloaded Kaggle dataset (git-ignored)
+├── embeddings/                    # Cached CNN embeddings
+├── models/                        # Trained XGBoost models
+├── shap_values/                   # Computed SHAP values
+└── data_valuation/                # Data Shapley results and analysis
 ```
 
 ## Installation
@@ -79,46 +73,51 @@ source .venv/bin/activate  # On macOS/Linux
 
 ## Usage
 
-Run notebooks in order:
+### Single Unified Notebook
 
-### 1. Data Download
-```bash
-jupyter notebook notebooks/01_data_download.ipynb
-```
-**Output**: Dataset in `data/raw/`
+Run the complete pipeline in one notebook:
 
-### 2. Feature Extraction
 ```bash
-jupyter notebook notebooks/02_feature_extraction.ipynb
+cd xray-shapley
+jupyter notebook xray_shapley.ipynb
 ```
-**Output**: Cached features in `data/features/`
-- `train_features.npz` (~20-50 MB)
-- `test_features.npz` (~5-10 MB)
 
-### 3. Model Training
-```bash
-jupyter notebook notebooks/03_model_training.ipynb
-```
-**Output**: Trained model in `models/`
-- XGBoost baseline accuracy: >85% on test set
+The notebook contains 5 integrated sections:
 
-### 4. SHAP Feature Analysis
-```bash
-jupyter notebook notebooks/04_shap_analysis.ipynb
-```
-**Output**: Feature importance visualizations
-- Summary plots (bar chart and beeswarm)
-- Dependence plots for top features
-- Individual prediction explanations
+**Section 1: Data Download**
+- Downloads NIH Chest X-rays 5% sample (~2.3 GB, ~5,606 images)
+- Change to full dataset (45 GB) in the download cell if needed
+- **Output**: Dataset in `data/`
 
-### 5. Data Valuation (Core Analysis)
-```bash
-jupyter notebook notebooks/05_data_valuation.ipynb
-```
-**Output**: Data quality analysis in `data_valuation/`
-- `data_shapley.npy` - Shapley values for all training samples
-- `data_valuation_results.csv` - Ranked samples with quality flags
-- Visualizations showing data efficiency curves
+**Section 2: Feature Extraction**
+- Loads pretrained ResNet50 and extracts 2048-dim embeddings
+- Caches features for fast reuse
+- **Output**: Cached features in `embeddings/`
+  - `train_features.npz` (~5-20 MB)
+  - `test_features.npz` (~1-5 MB)
+
+**Section 3: Model Training**
+- Trains XGBoost on cached CNN features
+- Evaluates on test set
+- **Output**: Trained model in `models/`
+  - XGBoost baseline accuracy: >85% on test set
+
+**Section 4: SHAP Feature Analysis**
+- Computes feature-level SHAP values
+- Generates feature importance visualizations
+- **Output**: Feature importance plots and SHAP values
+  - Summary plots (bar chart and beeswarm)
+  - Dependence plots for top features
+  - Individual prediction explanations
+
+**Section 5: Data Valuation (Core Analysis)**
+- Computes data-level Shapley values using KNN-Shapley
+- Detects noisy labels, outliers, and redundant samples
+- Validates with data efficiency experiments
+- **Output**: Data quality analysis in `data_valuation/`
+  - `data_shapley.npy` - Shapley values for all training samples
+  - `data_valuation_results.csv` - Ranked samples with quality flags
+  - Visualizations showing data efficiency curves
 
 **Key Results**:
 - Identifies high-value samples (maintain 95%+ accuracy with 70% of data)
@@ -135,6 +134,21 @@ jupyter notebook notebooks/05_data_valuation.ipynb
 | **Two-stage pipeline** | Combines CNN feature extraction with interpretable classification |
 | **KNN-SHAP approximation** | O(n log n) complexity, good accuracy-speed tradeoff |
 | **Cached features** | Extract once, train many times - critical for experimentation |
+
+## Dataset Size
+
+The notebook is configured to use the **5% sample dataset** (~2.3 GB):
+- ~5,606 X-ray images
+- Fast download and processing
+- Suitable for development and testing
+
+To use the **full dataset** (45 GB, 112,120 images), change this line in the notebook:
+
+```python
+kaggle_path = kagglehub.dataset_download("nih-chest-xrays/sample")
+# to:
+kaggle_path = kagglehub.dataset_download("nih-chest-xrays/data")
+```
 
 ## Expected Performance
 
