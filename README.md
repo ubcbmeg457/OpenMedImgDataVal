@@ -55,48 +55,84 @@ Core stack and libraries we use include:
 
 ## Getting Started
 
-These steps assume your machine runs macOS and has [Homebrew](https://brew.sh/) installed.
+### Prerequisites
 
-1. Clone project:
+- Python 3.11
+- [uv](https://docs.astral.sh/uv/) package manager
+- [Kaggle API credentials](https://github.com/Kaggle/kaggle-api#api-credentials) (for dataset downloads)
+
+### Local Setup
 
 ```sh
 git clone https://github.com/ubcbmeg457/OpenMedImgDataVal.git
 cd OpenMedImgDataVal
 ```
 
-2. Install [uv](https://github.com/astral-sh/uv):
+Install uv ([other methods](https://docs.astral.sh/uv/getting-started/installation/)):
 
 ```sh
+# macOS / Linux
 brew install uv
 ```
 
-3. Set up project:
+Install all dependencies:
 
 ```sh
 make setup
 ```
 
-4. Test project setup:
+### JupyterHub / HPC Setup
+
+On a cluster where JupyterHub is already running, you only need to install dependencies and register kernels:
 
 ```sh
-uv run main.py
+make setup
+make kernel
+```
+
+This registers a named Jupyter kernel for each subproject (e.g. "Python (xray-shapley)"). Open JupyterHub and select the
+kernel from the launcher or kernel picker.
+
+To register a single module:
+
+```sh
+make kernel MODULE=xray-shapley
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ## Usage
-Example: running Shapley value approximations on a toy dataset.
+
+### Running Notebooks
+
+Start Jupyter Lab locally for a specific pipeline:
+
 ```sh
-python examples/run_shapley.py --dataset mnist --approximation fastshap
+make notebook MODULE=xray-shapley
+make notebook MODULE=prototype
 ```
 
-Example: evaluating data valuation on a medical imaging dataset.
-```
-python examples/run_influence.py --dataset chestxray14 --model resnet18
+Or use the shortcuts:
+
+```sh
+make notebook-xray-shapley
+make notebook-prototype
 ```
 
-See the examples folder for scripts and reproducible benchmarks. For more detailed usage, please refer to the documentation.
+On JupyterHub, open the notebook file directly and select the registered kernel.
+
+### Development
+
+```sh
+make format    # Auto-fix formatting and lint issues (ruff)
+make lint      # Check formatting and lint without auto-fixing
+make clean     # Remove venvs, caches, and build artifacts
+make help      # Show all available targets
+```
+
+See individual subproject READMEs for pipeline-specific documentation:
+- [xray-shapley/README.md](xray-shapley/README.md) — SHAP-based data valuation for chest X-ray classification
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- DATASETS -->
@@ -124,30 +160,30 @@ See the [open issues](https://github.com/rsingla92/OpenMedImgDataVal/issues) for
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- REPOSITORY STRUCTURE -->
-# Repository Structure
+## Repository Structure
 ```
 OpenMedImgDataVal/
+├── Makefile                # Setup, notebooks, formatting, and cleanup
+├── pyproject.toml          # Root workspace config (uv + ruff)
+├── uv.lock                 # Locked dependencies for reproducibility
+├── .python-version         # Python version pin (3.11)
 │
-├── data/                   # Placeholder for dataset links/download scripts
-│   ├── README.md           # Instructions on how to fetch datasets
+├── xray-shapley/           # SHAP-based data valuation for chest X-rays
+│   ├── pyproject.toml      # Subproject dependencies
+│   ├── xray_shapley.ipynb  # End-to-end pipeline notebook
+│   └── README.md           # Pipeline walkthrough and results
 │
-├── docs/                   # Documentation and tutorials
-│   ├──                     # How to integrate external datasets
-│   ├──                     # Explanation of implemented valuation techniques
+├── prototype/              # Prototyping and experimentation
+│   ├── pyproject.toml
+│   └── prototype.ipynb
 │
-├── examples/               # Example scripts for running experiments
-│   ├── 
-│   ├── 
+├── mri-seg/                # MRI brain segmentation
+│   └── BRAINSEG.ipynb
 │
-├── openmedval/             # Core code
-│   ├── __init__.py
-│   ├── utils.py
-│
-├── tests/                  # Unit and integration tests
-│
-├── requirements.txt
-├── LICENSE.txt
-├── README.md
+├── docs/                   # Documentation and roadmap
+├── src/                    # Shared library code (planned)
+├── tests/                  # Tests (planned)
+└── examples/               # Example scripts (planned)
 ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -203,19 +239,3 @@ Project Link: [https://github.com/rsingla92/OpenMedImgDataVal](https://github.co
 [license-shield]: https://img.shields.io/github/license/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
 [license-url]: https://github.com/rsingla92/OpenMedImgDataVal/blob/master/LICENSE.txt
 [product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 

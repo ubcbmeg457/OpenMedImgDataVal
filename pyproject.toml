@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["prototype"]
+members = ["prototype", "xray-shapley"]
 
 [project]
 name = "openmedimgdataval"
@@ -9,12 +9,13 @@ readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "ipykernel>=7.1.0",
+    "jupyterlab>=4.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
+    "pre-commit>=4.0.0",
     "ruff==0.14.10",
-    "pre-commit==3.6.0",
 ]
 
 [tool.ruff]
@@ -29,4 +30,4 @@ select = [
     "I",    # isort
     "N",    # pep8-naming
 ]
-ignore = ["N812"]
+ignore = ["E501", "N812", "N803"]
