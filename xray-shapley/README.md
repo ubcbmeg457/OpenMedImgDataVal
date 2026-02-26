@@ -285,24 +285,28 @@ xray-shapley/
 
 ### Prerequisites
 
-- Python 3.11+
-- [UV package manager](https://docs.astral.sh/uv/)
-- [Kaggle API credentials](https://github.com/Kaggle/kaggle-api#api-credentials)
+- Python 3.11
+- [uv](https://docs.astral.sh/uv/) package manager
+- [Kaggle API credentials](https://github.com/Kaggle/kaggle-api#api-credentials) (for dataset download in Section 1)
 - CUDA optional (for faster feature extraction)
 
-### Setup
+### Local Setup
+
+From the repository root:
 
 ```bash
-# From repository root
-uv sync
-
-# Activate environment
-source .venv/bin/activate
-
-# Run the notebook
-cd xray-shapley
-jupyter notebook xray_shapley.ipynb
+make setup                        # Install all dependencies
+make notebook MODULE=xray-shapley # Launch Jupyter Lab in this directory
 ```
+
+### JupyterHub / HPC (Sockeye, Fir, etc.)
+
+```bash
+make setup                            # Install dependencies
+make kernel MODULE=xray-shapley       # Register the Jupyter kernel
+```
+
+Then open JupyterHub, navigate to `xray-shapley/xray_shapley.ipynb`, and select the **"Python (xray-shapley)"** kernel.
 
 ## Key Takeaways
 

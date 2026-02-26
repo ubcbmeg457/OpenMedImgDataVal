@@ -31,8 +31,6 @@ dependencies = [
     # Progress bars
     "tqdm>=4.65.0",
 
-    # Notebook
-    "jupyter>=1.0.0",
-    "notebook>=7.0.0",
+    # Notebook (ipykernel only — JupyterHub/Lab provides the server)
     "ipykernel>=6.25.0",
 ]
