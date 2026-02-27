@@ -138,25 +138,8 @@ See individual subproject READMEs for pipeline-specific documentation:
 <!-- DATASETS -->
 ## Datasets
 We focus on publicly available datasets for reproducibility.
-<a href="#">ChestX-ray14 (NIH)</a>: 100k+ frontal-view X-rays with 14 disease labels.
-<a href="#">CheXpert (Stanford)</a>: Large dataset with multi-label uncertainty annotations.
-<a href="#">MIMIC-CXR (PhysioNet)</a>: 370k chest radiographs with free-text reports.
-<a href="#">MedMNIST</a>: Lightweight benchmark datasets for rapid prototyping.
 
-Note: Due to licensing restrictions, datasets are not distributed in this repo. Please register and download them separately. Instructions for integration are in docs/datasets.md.
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ROADMAP -->
-## Roadmap
-- [ ] ?
-- [ ] ?
-- [ ] ?
-- [ ] ?
-- [ ] ?
-    - [ ] ?
-    - [ ] ?
-
-See the [open issues](https://github.com/rsingla92/OpenMedImgDataVal/issues) for a full list of proposed features (and known issues).
+> Note: Due to licensing restrictions, datasets are not distributed in this repo.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- REPOSITORY STRUCTURE -->
@@ -181,9 +164,7 @@ OpenMedImgDataVal/
 │   └── BRAINSEG.ipynb
 │
 ├── docs/                   # Documentation and roadmap
-├── src/                    # Shared library code (planned)
-├── tests/                  # Tests (planned)
-└── examples/               # Example scripts (planned)
+└── src/                    # Shared library code (planned)
 ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -228,14 +209,13 @@ Project Link: [https://github.com/rsingla92/OpenMedImgDataVal](https://github.co
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
-[contributors-url]: https://github.com/rsingla92/OpenMedImgDataVal/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
-[forks-url]: https://github.com/rsingla92/OpenMedImgDataVal/network/members
-[stars-shield]: https://img.shields.io/github/stars/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
-[stars-url]: https://github.com/rsingla92/OpenMedImgDataVal/stargazers
-[issues-shield]: https://img.shields.io/github/issues/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
-[issues-url]: https://github.com/rsingla92/OpenMedImgDataVal/issues
-[license-shield]: https://img.shields.io/github/license/rsingla92/OpenMedImgDataVal.svg?style=for-the-badge
-[license-url]: https://github.com/rsingla92/OpenMedImgDataVal/blob/master/LICENSE.txt
-[product-screenshot]: images/screenshot.png
+[contributors-shield]: https://img.shields.io/github/contributors/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
+[contributors-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
+[forks-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/network/members
+[stars-shield]: https://img.shields.io/github/stars/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
+[stars-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
+[issues-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/issues
+[license-shield]: https://img.shields.io/github/license/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
+[license-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/blob/main/LICENSE.txt
