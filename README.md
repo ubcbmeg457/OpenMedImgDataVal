@@ -12,7 +12,7 @@ Training data is the foundation of machine learning, yet not all data points are
 
 This repository explores and benchmarks **robust, scalable, and context-aware data valuation techniques** for machine learning pipelines, with an emphasis on **medical imaging datasets**.  
 
-We build on and extend methods like **Shapley values**. Our goal is to provide the community with open implementations and evaluations that enable:  
+Our goal is to provide the community with open implementations and evaluations that enable:  
 
 * Efficient data curation for expensive annotation pipelines.  
 * Identification of mislabeled, redundant, or harmful samples.  
@@ -21,17 +21,17 @@ We build on and extend methods like **Shapley values**. Our goal is to provide t
 
 Ultimately, this project is about enabling **better models with less data** without compromising rigor or reproducibility.
 
+Beyond model performance, data valuation is a **sustainability lever**. Training on smaller, higher-quality subsets means fewer GPU hours, lower energy consumption, and reduced carbon emissions without sacrificing accuracy.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Technologies
 
 Core stack and libraries we use include:
 
-* [PyTorch](https://pytorch.org/) for deep learning
-* [NumPy](https://numpy.org/) & [SciPy](https://scipy.org/) for numerical computation
-* [scikit-learn](https://scikit-learn.org/) for baseline models and utilities
-* [POT (Python Optimal Transport)](https://pythonot.github.io/) for OT methods
-* [Giotto-TDA](https://giotto-ai.github.io/gtda-docs/) for topological data analysis
+- [CodeCarbon](https://github.com/mlco2/codecarbon) for tracking CO2 emissions
+- [POT (Python Optimal Transport)](https://github.com/PythonOT/POT) for OT methods
+- [Giotto-TDA](https://github.com/giotto-ai/giotto-tda) for topological data analysis
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
