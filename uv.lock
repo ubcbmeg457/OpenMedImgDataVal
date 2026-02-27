@@ -6,7 +6,7 @@ requires-python = "==3.11.*"
 members = [
     "openmedimgdataval",
     "prototype",
-    "xray-shapley",
+    "xray-shapley-nb",
     "xray-shapley-py",
 ]
 
@@ -2387,9 +2387,9 @@ wheels = [
 ]
 
 [[package]]
-name = "xray-shapley"
+name = "xray-shapley-nb"
 version = "0.1.0"
-source = { virtual = "xray-shapley" }
+source = { virtual = "xray-shapley-nb" }
 dependencies = [
     { name = "ipykernel" },
     { name = "kagglehub" },

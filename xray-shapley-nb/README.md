@@ -192,7 +192,7 @@ After training:
 ## Directory Structure
 
 ```
-xray-shapley/
+xray-shapley-nb/
 ├── xray_shapley.ipynb      # Complete pipeline (run this)
 ├── pyproject.toml           # Dependencies
 ├── README.md                # This file
@@ -227,17 +227,17 @@ From the repository root:
 
 ```bash
 make setup                        # Install all dependencies
-make notebook MODULE=xray-shapley # Launch Jupyter Lab in this directory
+make notebook MODULE=xray-shapley-nb # Launch Jupyter Lab in this directory
 ```
 
 ### JupyterHub / HPC (Sockeye, Fir, etc.)
 
 ```bash
 make setup                            # Install dependencies
-make kernel MODULE=xray-shapley       # Register the Jupyter kernel
+make kernel MODULE=xray-shapley-nb       # Register the Jupyter kernel
 ```
 
-Then open JupyterHub, navigate to `xray-shapley/xray_shapley.ipynb`, and select the **"Python (xray-shapley)"** kernel.
+Then open JupyterHub, navigate to `xray-shapley-nb/xray_shapley.ipynb`, and select the **"Python (xray-shapley-nb)"** kernel.
 
 ## Key Takeaways
 

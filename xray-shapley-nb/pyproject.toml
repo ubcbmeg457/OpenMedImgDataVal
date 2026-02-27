@@ -1,5 +1,5 @@
 [project]
-name = "xray-shapley"
+name = "xray-shapley-nb"
 version = "0.1.0"
 description = "SHAP-based data valuation for chest X-ray classification"
 readme = "README.md"

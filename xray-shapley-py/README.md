@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the standalone Python-script version of the [`xray-shapley`](../xray-shapley/) notebook pipeline. Same end-to-end logic — download chest X-rays, fine-tune DenseNet121, compute SHAP explanations, run KNN-Shapley data valuation — but packaged as `python main.py` with all output tee'd to a log file and all plots saved as PNGs.
+This is the standalone Python-script version of the [`xray-shapley-nb`](../xray-shapley-nb/) notebook pipeline. Same end-to-end logic — download chest X-rays, fine-tune DenseNet121, compute SHAP explanations, run KNN-Shapley data valuation — but packaged as `python main.py` with all output tee'd to a log file and all plots saved as PNGs.
 
 **Core research question**: Which training samples actually help a chest X-ray classifier, and which ones hurt it?
 

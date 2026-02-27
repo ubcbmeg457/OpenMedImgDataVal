@@ -100,9 +100,9 @@ notebook:
 	cd $(MODULE) && uv run --project .. jupyter lab
 
 # Convenience shortcuts
-.PHONY: notebook-xray-shapley
-notebook-xray-shapley:
-	$(MAKE) notebook MODULE=xray-shapley
+.PHONY: notebook-xray-shapley-nb
+notebook-xray-shapley-nb:
+	$(MAKE) notebook MODULE=xray-shapley-nb
 
 .PHONY: notebook-prototype
 notebook-prototype:

@@ -90,13 +90,13 @@ make setup
 make kernel
 ```
 
-This registers a named Jupyter kernel for each subproject (e.g. "Python (xray-shapley)"). Open JupyterHub and select the
+This registers a named Jupyter kernel for each subproject (e.g. "Python (xray-shapley-nb)"). Open JupyterHub and select the
 kernel from the launcher or kernel picker.
 
 To register a single module:
 
 ```sh
-make kernel MODULE=xray-shapley
+make kernel MODULE=xray-shapley-nb
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -108,14 +108,14 @@ make kernel MODULE=xray-shapley
 Start Jupyter Lab locally for a specific pipeline:
 
 ```sh
-make notebook MODULE=xray-shapley
+make notebook MODULE=xray-shapley-nb
 make notebook MODULE=prototype
 ```
 
 Or use the shortcuts:
 
 ```sh
-make notebook-xray-shapley
+make notebook-xray-shapley-nb
 make notebook-prototype
 ```
 
@@ -131,7 +131,7 @@ make help      # Show all available targets
 ```
 
 See individual subproject READMEs for pipeline-specific documentation:
-- [xray-shapley/README.md](xray-shapley/README.md) — SHAP-based data valuation for chest X-ray classification
+- [xray-shapley-nb/README.md](xray-shapley-nb/README.md) — SHAP-based data valuation for chest X-ray classification (notebook)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -168,7 +168,7 @@ OpenMedImgDataVal/
 ├── uv.lock                 # Locked dependencies for reproducibility
 ├── .python-version         # Python version pin (3.11)
 │
-├── xray-shapley/           # SHAP-based data valuation for chest X-rays
+├── xray-shapley-nb/        # SHAP-based data valuation for chest X-rays (notebook)
 │   ├── pyproject.toml      # Subproject dependencies
 │   ├── xray_shapley.ipynb  # End-to-end pipeline notebook
 │   └── README.md           # Pipeline walkthrough and results
