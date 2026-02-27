@@ -117,15 +117,16 @@ See individual subproject READMEs for pipeline-specific documentation:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- DATASETS -->
 ## Datasets
+
 We focus on publicly available datasets for reproducibility.
 
 > Note: Due to licensing restrictions, datasets are not distributed in this repo.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- REPOSITORY STRUCTURE -->
 ## Repository Structure
+
 ```
 OpenMedImgDataVal/
 ├── Makefile                # Setup, notebooks, formatting, and cleanup
@@ -148,9 +149,9 @@ OpenMedImgDataVal/
 ├── docs/                   # Documentation and roadmap
 └── src/                    # Shared library code (planned)
 ```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- CONTRIBUTING -->
 ## Contributing
 We welcome contributions from the community—whether it’s extending methods, adding datasets, improving documentation, or sharing benchmarks.
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
@@ -163,33 +164,32 @@ Don't forget to give the project a star! Thanks again!
 5. Open a Pull Request
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- LICENSE -->
 ## License
+
 Distributed under the MIT License. See `LICENSE.txt` for more information.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- CONTACT -->
 ## Contact
+
 Maintainer:
 * Dr. Rohit Singla, MD PhD — [LinkedIn](https://www.linkedin.com/in/rsingla92/) - rsingla [at] ece [dot] ubc [dot] ca
 
 Contributors:
-* Dhairya Aggarwal - [@your_twitter](https://twitter.com/your_username)
-* Chloe Christensen - [@your_twitter](https://twitter.com/your_username)
+* Dhairya Aggarwal - [GitHub](https://github.com/DhairyaAggarwal02)
+* Chloe Christensen - [@GitHub](https://github.com/Chloechristensen)
 * Jaiden Siu - [GitHub](https://github.com/jaidensiu)
-* Amy Yu - [@your_twitter](https://twitter.com/your_username)
+* Amy Yu - [GitHub](https://github.com/amyyu799)
 
-Project Link: [https://github.com/rsingla92/OpenMedImgDataVal](https://github.com/rsingla92/OpenMedImgDataVal/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
+
 * Prof. Tim Salcudean for infrastructure support
 * The broader ML community for advancing research in data valuation
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-<!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/ubcbmeg457/OpenMedImgDataVal.svg?style=for-the-badge
 [contributors-url]: https://github.com/ubcbmeg457/OpenMedImgDataVal/graphs/contributors
