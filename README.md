@@ -8,24 +8,6 @@
 
 # Open Medical Imaging Data Valuation
 
-<div align="center">
-  <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-  <h3 align="center">Open Medical Imaging Data Valuation</h3>
-  <p align="center">
-    Is a picture worth a thousand well-curated training samples?  
-    <br />
-    <a href="docs"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="examples">View Examples</a>
-    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Report Bug</a>
-    <a href="https://github.com/ubcbmeg457/OpenMedImgDataVal/issues">Request Feature</a>
-  </p>
-</div>
-
-## About The Project
 Training data is the foundation of machine learning, yet not all data points are created equal. As models saturate in performance and as noisy or AI-generated content (“AI slop”) proliferates, the need for **principled methods to quantify the value of individual samples** is more pressing than ever. 
 
 This repository explores and benchmarks **robust, scalable, and context-aware data valuation techniques** for machine learning pipelines, with an emphasis on **medical imaging datasets**.  
