@@ -177,7 +177,7 @@ Maintainer:
 
 Contributors:
 * Dhairya Aggarwal - [GitHub](https://github.com/DhairyaAggarwal02)
-* Chloe Christensen - [@GitHub](https://github.com/Chloechristensen)
+* Chloe Christensen - [GitHub](https://github.com/Chloechristensen)
 * Jaiden Siu - [GitHub](https://github.com/jaidensiu)
 * Amy Yu - [GitHub](https://github.com/amyyu799)
 
