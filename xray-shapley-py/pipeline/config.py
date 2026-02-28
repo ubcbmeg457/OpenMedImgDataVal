@@ -74,6 +74,17 @@ REDUNDANCY_THRESHOLD = 0.01
 EFFICIENCY_FRACTIONS = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 # ---------------------------------------------------------------------------
+# Retraining experiment (Section 6)
+# ---------------------------------------------------------------------------
+RETRAIN_FRACTIONS: list[float] = [0.2, 0.5, 0.8, 1.0]
+RETRAIN_RANDOM_SEEDS: int = 1  # random-K repeats for error bars
+RETRAIN_NUM_EPOCHS: int = 5
+RETRAIN_PATIENCE: int = 2
+RETRAIN_LR: float = 1e-3
+RETRAIN_WEIGHT_DECAY: float = 1e-5
+RETRAIN_FINETUNE_ALL: bool = FINETUNE_ALL
+
+# ---------------------------------------------------------------------------
 # Reproducibility
 # ---------------------------------------------------------------------------
 SEED = 42

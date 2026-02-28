@@ -69,6 +69,28 @@ class TrainResult:
     y_test_pred_proba: np.ndarray
 
 
+@dataclass
+class MetricsResult:
+    """Standard classification metrics bundle."""
+
+    accuracy: float
+    precision: float
+    recall: float  # = sensitivity
+    specificity: float
+    f1: float
+    auc_roc: float
+
+    def to_dict(self) -> dict[str, float]:
+        return {
+            "accuracy": self.accuracy,
+            "precision": self.precision,
+            "recall": self.recall,
+            "specificity": self.specificity,
+            "f1": self.f1,
+            "auc_roc": self.auc_roc,
+        }
+
+
 # ---------------------------------------------------------------------------
 # Custom datasets
 # ---------------------------------------------------------------------------
@@ -149,30 +171,45 @@ def get_transforms() -> tuple[transforms.Compose, transforms.Compose]:
 # ---------------------------------------------------------------------------
 # Model creation
 # ---------------------------------------------------------------------------
-def create_model(device: torch.device) -> nn.Module:
-    """Load pretrained DenseNet121, replace head for binary classification."""
-    print("\n" + "=" * 60)
-    print("SECTION 2: MODEL SETUP AND DATA PREPARATION")
-    print("=" * 60)
+def create_fresh_model(device: torch.device, finetune_all: bool | None = None, quiet: bool = False) -> nn.Module:
+    """Load pretrained DenseNet121 with fresh ImageNet weights, replace head for binary classification.
+
+    This is the reusable core shared by ``create_model`` (Section 2) and the
+    retraining experiments (Section 6).  *quiet=True* suppresses print output
+    so that retraining loops stay concise.
+    """
+    if finetune_all is None:
+        finetune_all = config.FINETUNE_ALL
 
     densenet = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
     num_features = densenet.classifier.in_features  # 1024
     densenet.classifier = nn.Linear(num_features, 1)
 
-    if not config.FINETUNE_ALL:
+    if not finetune_all:
         for param in densenet.features.parameters():
             param.requires_grad = False
-        print("Frozen conv layers (head-only training)")
+        if not quiet:
+            print("Frozen conv layers (head-only training)")
     else:
-        print("All layers unfrozen (full fine-tuning)")
+        if not quiet:
+            print("All layers unfrozen (full fine-tuning)")
 
     densenet.to(device)
-    print(f"DenseNet121 loaded on {device}")
-    print(f"Classifier head: Linear({num_features}, 1)")
-    trainable = sum(p.numel() for p in densenet.parameters() if p.requires_grad)
-    total = sum(p.numel() for p in densenet.parameters())
-    print(f"Trainable parameters: {trainable:,} / {total:,}")
+    if not quiet:
+        print(f"DenseNet121 loaded on {device}")
+        print(f"Classifier head: Linear({num_features}, 1)")
+        trainable = sum(p.numel() for p in densenet.parameters() if p.requires_grad)
+        total = sum(p.numel() for p in densenet.parameters())
+        print(f"Trainable parameters: {trainable:,} / {total:,}")
     return densenet
+
+
+def create_model(device: torch.device) -> nn.Module:
+    """Load pretrained DenseNet121, replace head for binary classification."""
+    print("\n" + "=" * 60)
+    print("SECTION 2: MODEL SETUP AND DATA PREPARATION")
+    print("=" * 60)
+    return create_fresh_model(device, quiet=False)
 
 
 # ---------------------------------------------------------------------------
@@ -296,40 +333,57 @@ def visualize_pretrained_features(model: nn.Module, split: SplitData, device: to
 # ---------------------------------------------------------------------------
 # Training
 # ---------------------------------------------------------------------------
-def train_model(model: nn.Module, split: SplitData, device: torch.device) -> nn.Module:
-    """Fine-tune the DenseNet121 classifier head with early stopping."""
-    print("\n" + "=" * 60)
-    print("SECTION 3: MODEL TRAINING")
-    print("=" * 60)
+def train_model_on_loaders(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    y_train: np.ndarray,
+    y_val: np.ndarray,
+    device: torch.device,
+    *,
+    num_epochs: int = config.NUM_EPOCHS,
+    patience: int = config.PATIENCE,
+    lr: float = config.LEARNING_RATE,
+    weight_decay: float = config.WEIGHT_DECAY,
+    quiet: bool = False,
+) -> nn.Module:
+    """Train a model with BCEWithLogitsLoss, Adam, ReduceLROnPlateau, and early stopping.
 
-    neg_count = int(np.sum(split.y_train == 0))
-    pos_count = int(np.sum(split.y_train == 1))
+    This is the reusable core shared by ``train_model`` (Section 3) and the
+    retraining experiments (Section 6).  *quiet=True* suppresses per-epoch
+    prints and tqdm progress bars.
+    """
+    neg_count = int(np.sum(y_train == 0))
+    pos_count = int(np.sum(y_train == 1))
     pos_weight = torch.tensor([neg_count / pos_count], dtype=torch.float32).to(device)
-    print(f"Class balance — Negative: {neg_count}, Positive: {pos_count}, pos_weight: {pos_weight.item():.2f}")
+    if not quiet:
+        print(f"Class balance — Negative: {neg_count}, Positive: {pos_count}, pos_weight: {pos_weight.item():.2f}")
 
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = optim.Adam(
         filter(lambda p: p.requires_grad, model.parameters()),
-        lr=config.LEARNING_RATE,
-        weight_decay=config.WEIGHT_DECAY,
+        lr=lr,
+        weight_decay=weight_decay,
     )
     scheduler = ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=2)
 
-    print(f"Optimizer: Adam (lr={config.LEARNING_RATE}, wd={config.WEIGHT_DECAY})")
-    print("Scheduler: ReduceLROnPlateau (patience=2)")
-    print(f"Epochs: {config.NUM_EPOCHS}, Early stopping patience: {config.PATIENCE}")
+    if not quiet:
+        print(f"Optimizer: Adam (lr={lr}, wd={weight_decay})")
+        print("Scheduler: ReduceLROnPlateau (patience=2)")
+        print(f"Epochs: {num_epochs}, Early stopping patience: {patience}")
 
     best_val_auc = 0.0
     best_model_state = None
     epochs_no_improve = 0
 
-    for epoch in range(config.NUM_EPOCHS):
+    for epoch in range(num_epochs):
         # Training phase
         model.train()
         running_loss = 0.0
-        for images, labels in tqdm(
-            split.train_loader, desc=f"Epoch {epoch + 1}/{config.NUM_EPOCHS} [train]", leave=False
-        ):
+        loader_iter = (
+            train_loader if quiet else tqdm(train_loader, desc=f"Epoch {epoch + 1}/{num_epochs} [train]", leave=False)
+        )
+        for images, labels in loader_iter:
             images = images.to(device)
             labels = labels.float().unsqueeze(1).to(device)
             optimizer.zero_grad()
@@ -339,13 +393,13 @@ def train_model(model: nn.Module, split: SplitData, device: torch.device) -> nn.
             optimizer.step()
             running_loss += loss.item() * images.size(0)
 
-        train_loss = running_loss / len(split.train_loader.dataset)
+        train_loss = running_loss / len(train_loader.dataset)
 
         # Validation phase
         model.eval()
         val_logits_list, val_labels_list = [], []
         with torch.no_grad():
-            for images, labels in split.val_loader:
+            for images, labels in val_loader:
                 images = images.to(device)
                 logits = model(images).cpu()
                 val_logits_list.append(logits)
@@ -357,7 +411,8 @@ def train_model(model: nn.Module, split: SplitData, device: torch.device) -> nn.
         val_auc = roc_auc_score(val_labels.numpy(), val_probs)
 
         scheduler.step(val_auc)
-        print(f"Epoch {epoch + 1}/{config.NUM_EPOCHS} — Loss: {train_loss:.4f} — Val AUC: {val_auc:.4f}")
+        if not quiet:
+            print(f"Epoch {epoch + 1}/{num_epochs} — Loss: {train_loss:.4f} — Val AUC: {val_auc:.4f}")
 
         if val_auc > best_val_auc:
             best_val_auc = val_auc
@@ -365,20 +420,56 @@ def train_model(model: nn.Module, split: SplitData, device: torch.device) -> nn.
             epochs_no_improve = 0
         else:
             epochs_no_improve += 1
-            if epochs_no_improve >= config.PATIENCE:
-                print(f"Early stopping at epoch {epoch + 1} (no improvement for {config.PATIENCE} epochs)")
+            if epochs_no_improve >= patience:
+                if not quiet:
+                    print(f"Early stopping at epoch {epoch + 1} (no improvement for {patience} epochs)")
                 break
 
     model.load_state_dict(best_model_state)
     model.eval()
-    print(f"\nBest validation AUC: {best_val_auc:.4f}")
+    if not quiet:
+        print(f"\nBest validation AUC: {best_val_auc:.4f}")
     return model
+
+
+def train_model(model: nn.Module, split: SplitData, device: torch.device) -> nn.Module:
+    """Fine-tune the DenseNet121 classifier head with early stopping."""
+    print("\n" + "=" * 60)
+    print("SECTION 3: MODEL TRAINING")
+    print("=" * 60)
+    return train_model_on_loaders(
+        model,
+        split.train_loader,
+        split.val_loader,
+        split.y_train,
+        split.y_val,
+        device,
+        quiet=False,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_proba: np.ndarray) -> MetricsResult:
+    """Compute standard binary classification metrics from predictions."""
+    tn = int(np.sum((y_true == 0) & (y_pred == 0)))
+    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+    return MetricsResult(
+        accuracy=accuracy_score(y_true, y_pred),
+        precision=precision_score(y_true, y_pred, zero_division=0),
+        recall=recall_score(y_true, y_pred, zero_division=0),
+        specificity=specificity,
+        f1=f1_score(y_true, y_pred, zero_division=0),
+        auc_roc=roc_auc_score(y_true, y_pred_proba),
+    )
 
 
 # ---------------------------------------------------------------------------
 # Evaluation
 # ---------------------------------------------------------------------------
-def _predict_dataset(model: nn.Module, loader: DataLoader, device: torch.device):
+def predict_dataset(model: nn.Module, loader: DataLoader, device: torch.device):
     """Run inference and return (preds, probs, labels)."""
     model.eval()
     all_logits, all_labels = [], []
@@ -399,8 +490,8 @@ def evaluate_model(
     model: nn.Module, split: SplitData, device: torch.device
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Print metrics and plot confusion matrices. Return val/test preds+probs."""
-    y_val_pred, y_val_pred_proba, _ = _predict_dataset(model, split.val_loader, device)
-    y_test_pred, y_test_pred_proba, _ = _predict_dataset(model, split.test_loader, device)
+    y_val_pred, y_val_pred_proba, _ = predict_dataset(model, split.val_loader, device)
+    y_test_pred, y_test_pred_proba, _ = predict_dataset(model, split.test_loader, device)
 
     print("=" * 50)
     print("VALIDATION SET METRICS")

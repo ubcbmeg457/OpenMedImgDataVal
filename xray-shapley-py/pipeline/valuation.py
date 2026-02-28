@@ -35,11 +35,32 @@ def knn_data_shapley(
     y_val: np.ndarray,
     k: int = 10,
 ) -> np.ndarray:
-    """
-    Compute approximate Data Shapley values using k-nearest neighbours.
+    """Compute approximate Data Shapley values using k-nearest neighbours.
 
-    For each validation sample, finds k nearest training neighbours and
-    assigns +1/k (same label) or -1/k (different label) contributions.
+    **Why not exact Data Shapley?**
+    Exact computation requires evaluating O(2^n) subsets, or O(n! * T) Monte
+    Carlo permutations where T is the cost of a single model retrain.  With
+    n ~ 3,587 training samples and T ~ 5 min per DenseNet121 retrain, even
+    100 permutations would take ~3.4 years on a single GPU.
+
+    **What KNN-Shapley provides:**
+    An O(n log n) closed-form solution for KNN classifiers (Jia et al., 2019).
+    For each validation sample the k nearest training neighbours receive +1/k
+    (same label) or -1/k (different label), leveraging embedding-space geometry
+    instead of model retraining.
+
+    **Trade-offs:**
+    The approximation is exact relative to a KNN classifier, not to DenseNet121
+    itself.  Quality depends on how well the frozen embedding space preserves
+    task-relevant structure.  Section 6 (retraining experiments) validates
+    these rankings end-to-end by retraining DenseNet121 from ImageNet weights
+    on Shapley-ranked subsets.
+
+    **References:**
+    - Ghorbani & Zou (2019). "Data Shapley: Equitable Valuation of Data for
+      Machine Learning." ICML.
+    - Jia et al. (2019). "Towards Efficient Data Valuation Based on the
+      Shapley Value." VLDB / AISTATS.
     """
     print("Computing KNN-Shapley approximation...")
     data_shapley = np.zeros(len(X_train))
@@ -213,8 +234,28 @@ def evaluate_data_efficiency(
     data_shapley: np.ndarray,
     fractions: list[float] | None = None,
 ) -> dict[str, list[float]]:
-    """
-    Compare training on different data fractions selected by:
+    """Compare training on different data fractions via a lightweight linear head.
+
+    **Why a linear head?**
+    ``nn.Linear(1024, 1)`` trains in ~0.1 s on CPU, enabling rapid iteration
+    across many fractions and selection strategies.  It acts as a fast
+    inner-loop proxy for data-quality assessment.
+
+    **What it tests:**
+    Linear separability in the frozen 1024-dim embedding space produced by the
+    Section 3 DenseNet121 model.
+
+    **Limitations:**
+    - Does not capture nonlinear decision boundaries.
+    - Uses embeddings from the pre-cleaning model (trained on all data).
+    - Evaluates on the validation set, not the held-out test set.
+
+    **Relationship to Section 6:**
+    For rigorous end-to-end validation, see Section 6 which retrains
+    DenseNet121 from ImageNet weights on each subset and evaluates on the
+    held-out test set.
+
+    Strategies compared:
     - Top-K (highest Shapley)
     - Random-K (baseline)
     - Bottom-K (lowest Shapley)

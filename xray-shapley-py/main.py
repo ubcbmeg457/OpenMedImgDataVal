@@ -30,6 +30,7 @@ from pipeline.model import (
     train_model,
     visualize_pretrained_features,
 )
+from pipeline.retraining import run_retraining_evaluation
 from pipeline.shap_analysis import run_shap_analysis
 from pipeline.valuation import run_data_valuation
 
@@ -126,7 +127,10 @@ def _run_pipeline() -> None:
     shap_result = run_shap_analysis(train_result, split)  # noqa: F841
 
     # --- Section 5: Data valuation ---
-    run_data_valuation(train_result, split)
+    valuation_result = run_data_valuation(train_result, split)
+
+    # --- Section 6: Retraining experiments ---
+    run_retraining_evaluation(valuation_result, split, device)
 
     elapsed = time.time() - start
     print(f"\nPipeline completed in {elapsed / 60:.1f} minutes.")

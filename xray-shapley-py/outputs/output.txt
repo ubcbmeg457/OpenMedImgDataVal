@@ -265,27 +265,29 @@ Key Metrics:
 Results saved to outputs/results
 
 Top rows of results:
-      sample_idx  shapley_value  label  is_noisy  is_outlier  is_redundant  is_high_value
-1816        1816            1.5      0     False       False         False           True
-2892        2892            1.4      1     False       False         False           True
-2550        2550            1.4      0     False       False         False           True
-3418        3418            1.3      0     False       False         False           True
-848          848            1.3      0     False       False         False           True
-2374        2374            1.2      0     False       False         False           True
-3149        3149            1.2      1     False       False         False           True
-2964        2964            1.2      0     False       False         False           True
-2272        2272            1.1      0     False       False         False           True
-901          901            1.1      0     False       False         False           True
-1264        1264            1.1      0     False       False         False           True
-3407        3407            1.1      0     False       False         False           True
-3265        3265            1.0      0     False       False         False           True
-1247        1247            1.0      0     False       False         False           True
-2624        2624            1.0      0     False       False         False           True
-187          187            1.0      0     False       False         False           True
-3018        3018            1.0      0     False       False         False           True
-996          996            1.0      0     False       False         False           True
-669          669            1.0      0     False       False         False           True
-1875        1875            1.0      1     False       False         False           True
+      sample_idx  shapley_value  label  ...  is_outlier  is_redundant  is_high_value
+1816        1816            1.5      0  ...       False         False           True
+2892        2892            1.4      1  ...       False         False           True
+2550        2550            1.4      0  ...       False         False           True
+3418        3418            1.3      0  ...       False         False           True
+848          848            1.3      0  ...       False         False           True
+2374        2374            1.2      0  ...       False         False           True
+3149        3149            1.2      1  ...       False         False           True
+2964        2964            1.2      0  ...       False         False           True
+2272        2272            1.1      0  ...       False         False           True
+901          901            1.1      0  ...       False         False           True
+1264        1264            1.1      0  ...       False         False           True
+3407        3407            1.1      0  ...       False         False           True
+3265        3265            1.0      0  ...       False         False           True
+1247        1247            1.0      0  ...       False         False           True
+2624        2624            1.0      0  ...       False         False           True
+187          187            1.0      0  ...       False         False           True
+3018        3018            1.0      0  ...       False         False           True
+996          996            1.0      0  ...       False         False           True
+669          669            1.0      0  ...       False         False           True
+1875        1875            1.0      1  ...       False         False           True
+
+[20 rows x 7 columns]
 
 ======================================================================
 DATA VALUATION RECOMMENDATIONS
@@ -323,5 +325,54 @@ DATA VALUATION RECOMMENDATIONS
 
 ======================================================================
 
-Pipeline completed in 65.9 minutes.
+============================================================
+SECTION 6: RETRAINING EXPERIMENTS
+============================================================
+Training samples: 3587
+Fractions: [0.2, 0.5, 0.8, 1.0]
+Strategies: top_k, bottom_k, random (x1 seeds)
+Total retraining runs: 12
+Epochs per run: 5 (patience=2)
+LR: 0.001, Weight decay: 1e-05
+Finetune all layers: False
+
+  [ 1/12] top_k     20% ( 717 samples)  AUC=0.6957  F1=0.6578
+  [ 2/12] bottom_k  20% ( 717 samples)  AUC=0.4712  F1=0.6147
+  [ 3/12] random    20% ( 717 samples, seed=42)  AUC=0.7208  F1=0.6091
+  [ 4/12] top_k     50% (1793 samples)  AUC=0.7163  F1=0.6565
+  [ 5/12] bottom_k  50% (1793 samples)  AUC=0.6833  F1=0.5071
+  [ 6/12] random    50% (1793 samples, seed=42)  AUC=0.6990  F1=0.6166
+  [ 7/12] top_k     80% (2869 samples)  AUC=0.7263  F1=0.5073
+  [ 8/12] bottom_k  80% (2869 samples)  AUC=0.7156  F1=0.6249
+  [ 9/12] random    80% (2869 samples, seed=42)  AUC=0.7180  F1=0.6791
+  [10/12] top_k     100% (3587 samples)  AUC=0.7367  F1=0.6796
+  [11/12] bottom_k  100% (3587 samples)  AUC=0.7261  F1=0.6768
+  [12/12] random    100% (3587 samples, seed=42)  AUC=0.7274  F1=0.5775
+
+=========================================================================================
+RETRAINING RESULTS SUMMARY
+=========================================================================================
+  Frac   Strategy     auc_roc          f1   precision      recall specificity    accuracy
+-----------------------------------------------------------------------------------------
+   20%      top_k      0.6957      0.6578      0.5741      0.7700      0.5189      0.6337
+         bottom_k      0.4712      0.6147      0.4536      0.9532      0.0328      0.4537
+           random 0.7208±0.0000 0.6091±0.0000 0.6828±0.0000 0.5497±0.0000 0.7849±0.0000 0.6774±0.0000
+   50%      top_k      0.7163      0.6565      0.6080      0.7135      0.6125      0.6586
+         bottom_k      0.6833      0.5071      0.6514      0.4152      0.8128      0.6310
+           random 0.6990±0.0000 0.6166±0.0000 0.6337±0.0000 0.6004±0.0000 0.7077±0.0000 0.6586±0.0000
+   80%      top_k      0.7263      0.5073      0.6775      0.4055      0.8374      0.6399
+         bottom_k      0.7156      0.6249      0.6609      0.5926      0.7438      0.6747
+           random 0.7180±0.0000 0.6791±0.0000 0.5646±0.0000 0.8519±0.0000 0.4466±0.0000 0.6319±0.0000
+  100%      top_k      0.7367      0.6796      0.5988      0.7856      0.5567      0.6613
+         bottom_k      0.7261      0.6768      0.6605      0.6940      0.6995      0.6970
+           random 0.7274±0.0000 0.5775±0.0000 0.6817±0.0000 0.5010±0.0000 0.8030±0.0000 0.6649±0.0000
+-----------------------------------------------------------------------------------------
+  100%   baseline      0.7367      0.6796      0.5988      0.7856      0.5567      0.6613
+
+Note: 'baseline' is the full-dataset retrain. 'random' shows mean±std across 1 seeds.
+Saved: outputs/plots/retraining_curves.png
+Saved: outputs/plots/retraining_all_metrics.png
+Saved: outputs/results/retraining_results.csv
+
+Pipeline completed in 750.4 minutes.
 Outputs: outputs
