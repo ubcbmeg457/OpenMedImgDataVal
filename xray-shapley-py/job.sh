@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=xray-shapley
-#SBATCH --account=rrg-timsbc
+#SBATCH --account=rrg-timsbc_gpu
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=64G
