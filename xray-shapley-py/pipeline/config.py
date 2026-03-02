@@ -32,9 +32,9 @@ def rel(path: Path | str) -> str:
 # ---------------------------------------------------------------------------
 # Dataset
 # ---------------------------------------------------------------------------
-# 5% sample (~2.3 GB, ~5,606 images).  Change to "nih-chest-xrays/data" for
-# the full 45 GB / 112,120 image dataset.
-KAGGLE_DATASET = "nih-chest-xrays/sample"
+# "nih-chest-xrays/sample" for 5% sample (~2.3 GB, ~5,606 images).
+# Change to "nih-chest-xrays/data" for the full 45 GB / 112,120 image dataset.
+KAGGLE_DATASET = "nih-chest-xrays/data"
 
 # ---------------------------------------------------------------------------
 # ImageNet normalization (used by DenseNet121)
