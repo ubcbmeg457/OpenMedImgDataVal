@@ -23,11 +23,17 @@ class ShapResult:
 # ---------------------------------------------------------------------------
 # Explainer initialisation
 # ---------------------------------------------------------------------------
+def _model_device(module: nn.Module) -> torch.device:
+    """Return the device of the first parameter in *module*."""
+    return next(module.parameters()).device
+
+
 def init_explainer(classifier_head: nn.Module, X_train: np.ndarray) -> tuple[shap.Explainer, torch.Tensor]:
     """Create a GradientExplainer (with DeepExplainer fallback) on the classifier head."""
+    device = _model_device(classifier_head)
     background_size = min(config.SHAP_BACKGROUND_SIZE, len(X_train))
     bg_indices = np.random.choice(len(X_train), background_size, replace=False)
-    background = torch.tensor(X_train[bg_indices], dtype=torch.float32)
+    background = torch.tensor(X_train[bg_indices], dtype=torch.float32).to(device)
 
     print("Initializing SHAP GradientExplainer on classifier head...")
     print(f"Background samples: {background_size}")
@@ -53,7 +59,8 @@ def compute_shap_values(
 ) -> tuple[np.ndarray, float]:
     """Compute SHAP values for test embeddings and return (shap_values, expected_value)."""
     print("Computing SHAP values for test set...")
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    device = _model_device(classifier_head)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32).to(device)
     shap_values = explainer.shap_values(X_test_tensor)
 
     if isinstance(shap_values, list):
@@ -139,7 +146,8 @@ def plot_shap_waterfall(
         print(f"True label: {y_test[idx]} ({'NO FINDING' if y_test[idx] == 0 else 'HAS FINDING'})")
 
         with torch.no_grad():
-            logit = classifier_head(torch.tensor(X_test[idx : idx + 1], dtype=torch.float32)).item()
+            device = _model_device(classifier_head)
+            logit = classifier_head(torch.tensor(X_test[idx : idx + 1], dtype=torch.float32).to(device)).item()
         prob = 1.0 / (1.0 + np.exp(-logit))
         prediction = 1 if prob >= 0.5 else 0
         print(f"Predicted label: {prediction} ({'NO FINDING' if prediction == 0 else 'HAS FINDING'})")
