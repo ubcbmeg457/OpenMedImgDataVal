@@ -21,8 +21,7 @@ class DataResult:
 
 def download_dataset() -> Path:
     """Download the NIH Chest X-rays dataset via kagglehub and return the cache path."""
-    print("Downloading NIH Chest X-rays 5% sample dataset from Kaggle...")
-    print("(This is ~2.3 GB. Full dataset is ~45 GB — use 'nih-chest-xrays/data' if you want the full version)")
+    print("Downloading NIH Chest X-rays dataset from Kaggle...")
     kaggle_path = kagglehub.dataset_download(config.KAGGLE_DATASET)
     print(f"Downloaded to: {config.rel(kaggle_path)}")
     return Path(kaggle_path)
