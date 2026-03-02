@@ -31,11 +31,6 @@ module purge
 module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
 
 # ---------------------------------------------------------------------------
-# Use scratch for kagglehub cache (home quota is too small for 45GB dataset)
-# ---------------------------------------------------------------------------
-export XDG_CACHE_HOME=/scratch/jsiu/.cache
-
-# ---------------------------------------------------------------------------
 # Run the pipeline using the uv-managed venv
 # ---------------------------------------------------------------------------
 cd "$PROJECT_DIR/xray-shapley-py"
