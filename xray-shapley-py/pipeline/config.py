@@ -32,8 +32,8 @@ def rel(path: Path | str) -> str:
 # ---------------------------------------------------------------------------
 # Dataset
 # ---------------------------------------------------------------------------
-# "nih-chest-xrays/sample" for 5% sample (~2.3 GB, ~5,606 images).
-# Change to "nih-chest-xrays/data" for the full 45 GB / 112,120 image dataset.
+# "nih-chest-xrays/sample" for the 5% sample dataset (~2.3 GB, 5,606 images).
+# "nih-chest-xrays/data" for the full dataset (~45 GB, 112,120 images).
 KAGGLE_DATASET = "nih-chest-xrays/data"
 
 # ---------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 """Section 1: Data download, organization, and exploration."""
 
 import os
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,6 +8,17 @@ import kagglehub
 import pandas as pd
 
 from pipeline import config
+
+# ---------------------------------------------------------------------------
+# Full vs sample dataset layout
+# ---------------------------------------------------------------------------
+# Sample ("nih-chest-xrays/sample"):
+#   sample_labels.csv, sample/images/*.png
+#
+# Full ("nih-chest-xrays/data"):
+#   Data_Entry_2017.csv, images_001/images/*.png … images_012/images/*.png
+# ---------------------------------------------------------------------------
+_IS_FULL_DATASET = "nih-chest-xrays/data" in config.KAGGLE_DATASET
 
 
 @dataclass
@@ -35,19 +45,44 @@ def link_to_data_dir(kaggle_path: Path) -> None:
         src = Path(os.path.join(kaggle_path, item)).resolve()
         dst = config.DATA_DIR / item
         if dst.is_symlink() or dst.exists():
-            if dst.is_symlink():
-                dst.unlink()
-            elif dst.is_dir():
-                shutil.rmtree(dst)
-            else:
-                dst.unlink()
-        os.symlink(src, dst)
+            dst.unlink() if (dst.is_symlink() or dst.is_file()) else None
+        if not dst.exists():
+            os.symlink(src, dst)
     print("Dataset linked successfully")
+
+
+def _collect_images(kaggle_path: Path) -> Path:
+    """Create a single flat image directory by symlinking images from all sub-folders.
+
+    The full dataset stores images in images_001/images/, images_002/images/, etc.
+    This creates DATA_DIR/images/ with symlinks to every individual .png so the rest
+    of the pipeline can use a single image_dir.
+    """
+    image_dir = config.DATA_DIR / "images"
+    image_dir.mkdir(parents=True, exist_ok=True)
+
+    count = 0
+    for subdir in sorted(kaggle_path.iterdir()):
+        inner = subdir / "images"
+        if not inner.is_dir():
+            continue
+        for img in inner.iterdir():
+            dst = image_dir / img.name
+            if not dst.exists():
+                os.symlink(img.resolve(), dst)
+                count += 1
+
+    print(f"Linked {count} images into {config.rel(image_dir)}")
+    return image_dir
 
 
 def load_labels() -> pd.DataFrame:
     """Read the labels CSV and return as a DataFrame."""
-    labels_csv = config.DATA_DIR / "sample_labels.csv"
+    if _IS_FULL_DATASET:
+        labels_csv = config.DATA_DIR / "Data_Entry_2017.csv"
+    else:
+        labels_csv = config.DATA_DIR / "sample_labels.csv"
+
     if not labels_csv.exists():
         raise FileNotFoundError(f"Expected {config.rel(labels_csv)}")
     df = pd.read_csv(labels_csv)
@@ -70,18 +105,23 @@ def explore_data() -> None:
 
 
 def download_and_prepare_data() -> DataResult:
-    """Orchestrator: download, copy, explore, and return paths + labels."""
+    """Orchestrator: download, link, explore, and return paths + labels."""
     print("=" * 60)
     print("SECTION 1: DATA DOWNLOAD AND PREPARATION")
     print("=" * 60)
 
     kaggle_path = download_dataset()
     link_to_data_dir(kaggle_path)
+
+    if _IS_FULL_DATASET:
+        image_dir = _collect_images(kaggle_path)
+    else:
+        image_dir = config.DATA_DIR / "sample" / "images"
+
     explore_data()
 
     df_labels = load_labels()
 
-    image_dir = config.DATA_DIR / "sample" / "images"
     if not image_dir.exists():
         raise FileNotFoundError(f"Expected {config.rel(image_dir)}")
 
