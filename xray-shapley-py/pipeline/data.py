@@ -27,18 +27,22 @@ def download_dataset() -> Path:
     return Path(kaggle_path)
 
 
-def copy_to_data_dir(kaggle_path: Path) -> None:
-    """Copy the downloaded dataset into the local DATA_DIR."""
+def link_to_data_dir(kaggle_path: Path) -> None:
+    """Symlink the downloaded dataset into the local DATA_DIR (avoids duplicating ~45 GB)."""
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Copying files to {config.rel(config.DATA_DIR)}...")
+    print(f"Linking files to {config.rel(config.DATA_DIR)}...")
     for item in os.listdir(kaggle_path):
-        src = os.path.join(kaggle_path, item)
+        src = Path(os.path.join(kaggle_path, item)).resolve()
         dst = config.DATA_DIR / item
-        if os.path.isdir(src):
-            shutil.copytree(src, dst, dirs_exist_ok=True)
-        else:
-            shutil.copy2(src, dst)
-    print("Dataset organized successfully")
+        if dst.is_symlink() or dst.exists():
+            if dst.is_symlink():
+                dst.unlink()
+            elif dst.is_dir():
+                shutil.rmtree(dst)
+            else:
+                dst.unlink()
+        os.symlink(src, dst)
+    print("Dataset linked successfully")
 
 
 def load_labels() -> pd.DataFrame:
@@ -72,7 +76,7 @@ def download_and_prepare_data() -> DataResult:
     print("=" * 60)
 
     kaggle_path = download_dataset()
-    copy_to_data_dir(kaggle_path)
+    link_to_data_dir(kaggle_path)
     explore_data()
 
     df_labels = load_labels()
