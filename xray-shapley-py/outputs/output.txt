@@ -86,6 +86,7 @@ Test embeddings: (1122, 1024)
 Extracting train-subset embeddings...
 Train-subset embeddings: (3587, 1024)
 Extracting val-subset embeddings...
+Extracting embeddings: 100%|██████████████████████████████████████████████████████████████████████████| 29/29 [01:05<00:00,  2.25s/it]
 Val-subset embeddings: (897, 1024)
 
 Embeddings cached to outputs/embeddings/
@@ -132,7 +133,11 @@ SHAP values shape: (1122, 1024)
 Sample SHAP values (first instance): [ 9.96184059e-06 -2.66029937e-05 -1.03992169e-05 -2.54878184e-07
   4.84543247e-04]
 Expected prediction (base value): 0.1161
+xray-shapley-py/pipeline/shap_analysis.py:84: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
 Saved: outputs/plots/shap_bar.png
+xray-shapley-py/pipeline/shap_analysis.py:94: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(shap_values, X_test, show=False, max_display=15)
 Saved: outputs/plots/shap_beeswarm.png
 Top 10 most important features (by SHAP):
  1. Feature 936: 0.0420
@@ -245,6 +250,7 @@ Data Quality Issues Detected:
 Running data efficiency experiments...
 (Using F1 score, pos_weight=1.19, nn.Linear head on 1024-dim embeddings)
 
+Data fractions: 100%|███████████████████████████████████████████████████████████████████████████████████| 6/6 [00:00<00:00, 19.94it/s]
 
 Data Efficiency Results:
 ------------------------------------------------------------
@@ -265,29 +271,27 @@ Key Metrics:
 Results saved to outputs/results
 
 Top rows of results:
-      sample_idx  shapley_value  label  ...  is_outlier  is_redundant  is_high_value
-1816        1816            1.5      0  ...       False         False           True
-2892        2892            1.4      1  ...       False         False           True
-2550        2550            1.4      0  ...       False         False           True
-3418        3418            1.3      0  ...       False         False           True
-848          848            1.3      0  ...       False         False           True
-2374        2374            1.2      0  ...       False         False           True
-3149        3149            1.2      1  ...       False         False           True
-2964        2964            1.2      0  ...       False         False           True
-2272        2272            1.1      0  ...       False         False           True
-901          901            1.1      0  ...       False         False           True
-1264        1264            1.1      0  ...       False         False           True
-3407        3407            1.1      0  ...       False         False           True
-3265        3265            1.0      0  ...       False         False           True
-1247        1247            1.0      0  ...       False         False           True
-2624        2624            1.0      0  ...       False         False           True
-187          187            1.0      0  ...       False         False           True
-3018        3018            1.0      0  ...       False         False           True
-996          996            1.0      0  ...       False         False           True
-669          669            1.0      0  ...       False         False           True
-1875        1875            1.0      1  ...       False         False           True
-
-[20 rows x 7 columns]
+      sample_idx  shapley_value  label  is_noisy  is_outlier  is_redundant  is_high_value
+1816        1816            1.5      0     False       False         False           True
+2892        2892            1.4      1     False       False         False           True
+2550        2550            1.4      0     False       False         False           True
+3418        3418            1.3      0     False       False         False           True
+848          848            1.3      0     False       False         False           True
+2374        2374            1.2      0     False       False         False           True
+3149        3149            1.2      1     False       False         False           True
+2964        2964            1.2      0     False       False         False           True
+2272        2272            1.1      0     False       False         False           True
+901          901            1.1      0     False       False         False           True
+1264        1264            1.1      0     False       False         False           True
+3407        3407            1.1      0     False       False         False           True
+3265        3265            1.0      0     False       False         False           True
+1247        1247            1.0      0     False       False         False           True
+2624        2624            1.0      0     False       False         False           True
+187          187            1.0      0     False       False         False           True
+3018        3018            1.0      0     False       False         False           True
+996          996            1.0      0     False       False         False           True
+669          669            1.0      0     False       False         False           True
+1875        1875            1.0      1     False       False         False           True
 
 ======================================================================
 DATA VALUATION RECOMMENDATIONS
@@ -345,9 +349,9 @@ Finetune all layers: False
   [ 7/12] top_k     80% (2869 samples)  AUC=0.7263  F1=0.5073
   [ 8/12] bottom_k  80% (2869 samples)  AUC=0.7156  F1=0.6249
   [ 9/12] random    80% (2869 samples, seed=42)  AUC=0.7180  F1=0.6791
-  [10/12] top_k     100% (3587 samples)  AUC=0.7367  F1=0.6796
-  [11/12] bottom_k  100% (3587 samples)  AUC=0.7261  F1=0.6768
-  [12/12] random    100% (3587 samples, seed=42)  AUC=0.7274  F1=0.5775
+  [10/12] top_k     100% (3587 samples)  AUC=0.7320  F1=0.5886
+  [11/12] bottom_k  100% (3587 samples)  AUC=0.7320  F1=0.5886
+  [12/12] random    100% (3587 samples, seed=42)  AUC=0.7320  F1=0.5886
 
 =========================================================================================
 RETRAINING RESULTS SUMMARY
@@ -363,16 +367,16 @@ RETRAINING RESULTS SUMMARY
    80%      top_k      0.7263      0.5073      0.6775      0.4055      0.8374      0.6399
          bottom_k      0.7156      0.6249      0.6609      0.5926      0.7438      0.6747
            random 0.7180±0.0000 0.6791±0.0000 0.5646±0.0000 0.8519±0.0000 0.4466±0.0000 0.6319±0.0000
-  100%      top_k      0.7367      0.6796      0.5988      0.7856      0.5567      0.6613
-         bottom_k      0.7261      0.6768      0.6605      0.6940      0.6995      0.6970
-           random 0.7274±0.0000 0.5775±0.0000 0.6817±0.0000 0.5010±0.0000 0.8030±0.0000 0.6649±0.0000
+  100%      top_k      0.7320      0.5886      0.6875      0.5146      0.8030      0.6711
+         bottom_k      0.7320      0.5886      0.6875      0.5146      0.8030      0.6711
+           random 0.7320±0.0000 0.5886±0.0000 0.6875±0.0000 0.5146±0.0000 0.8030±0.0000 0.6711±0.0000
 -----------------------------------------------------------------------------------------
-  100%   baseline      0.7367      0.6796      0.5988      0.7856      0.5567      0.6613
+  100%   baseline      0.7320      0.5886      0.6875      0.5146      0.8030      0.6711
 
 Note: 'baseline' is the full-dataset retrain. 'random' shows mean±std across 1 seeds.
 Saved: outputs/plots/retraining_curves.png
 Saved: outputs/plots/retraining_all_metrics.png
 Saved: outputs/results/retraining_results.csv
 
-Pipeline completed in 750.4 minutes.
+Pipeline completed in 256.4 minutes.
 Outputs: outputs
