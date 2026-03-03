@@ -1,3 +1,9 @@
+=== Job 25297296 started on fc11007 at Mon Mar  2 09:46:55 AM PST 2026 ===
+Python: Python 3.11.4
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU: NVIDIA H100 80GB HBM3 MIG 1g.10gb
+
 ============================================================
 X-RAY SHAPLEY: DATA VALUATION PIPELINE (Python script)
 ============================================================
@@ -9,7 +15,7 @@ Seed: 42
 SECTION 1: DATA DOWNLOAD AND PREPARATION
 ============================================================
 Downloading NIH Chest X-rays dataset from Kaggle...
-Downloaded to: ~/.cache/kagglehub/datasets/nih-chest-xrays/data/versions/3
+Downloaded to: /home/jsiu/.cache/kagglehub/datasets/nih-chest-xrays/data/versions/3
 Linking files to outputs/data...
 Dataset linked successfully
 Linked 0 images into outputs/data/images
@@ -33,7 +39,7 @@ Loaded 112120 label rows
 ============================================================
 SECTION 2: MODEL SETUP AND DATA PREPARATION
 ============================================================
-Downloading: "https://download.pytorch.org/models/densenet121-a639ec97.pth" to ~/.cache/torch/hub/checkpoints/densenet121-a639ec97.pth
+Downloading: "https://download.pytorch.org/models/densenet121-a639ec97.pth" to /home/jsiu/.cache/torch/hub/checkpoints/densenet121-a639ec97.pth
 Frozen conv layers (head-only training)
 DenseNet121 loaded on cuda
 Classifier head: Linear(1024, 1)
@@ -241,100 +247,3 @@ Data Quality Issues Detected:
 Running data efficiency experiments...
 (Using F1 score, pos_weight=1.17, nn.Linear head on 1024-dim embeddings)
 
-
-Data Efficiency Results:
-------------------------------------------------------------
-  Fraction      Top-K     Random   Bottom-K
-------------------------------------------------------------
-     50.0%     0.6504     0.6151     0.6571
-     60.0%     0.6061     0.6390     0.6589
-     70.0%     0.6517     0.6412     0.6605
-     80.0%     0.6515     0.6576     0.5974
-     90.0%     0.6547     0.6082     0.6150
-    100.0%     0.6184     0.6101     0.6548
-Saved: outputs/plots/efficiency_curves.png
-
-Key Metrics:
-  Full dataset F1: 0.6184
-  Top 70% F1: 0.6517
-  F1 retention: 105.4%
-Results saved to outputs/results
-
-Top rows of results:
-       sample_idx  shapley_value  ...  is_redundant  is_high_value
-45908       45908            8.1  ...         False           True
-21697       21697            7.8  ...         False           True
-53684       53684            6.3  ...         False           True
-7551         7551            5.8  ...         False           True
-20406       20406            5.2  ...         False           True
-71656       71656            4.8  ...         False           True
-51566       51566            4.2  ...         False           True
-13373       13373            3.8  ...         False           True
-802           802            3.8  ...         False           True
-19251       19251            3.7  ...         False           True
-5347         5347            3.6  ...         False           True
-47386       47386            3.6  ...         False           True
-23200       23200            3.5  ...         False           True
-29262       29262            3.0  ...         False           True
-49589       49589            2.9  ...         False           True
-14528       14528            2.8  ...         False           True
-56757       56757            2.8  ...         False           True
-5790         5790            2.8  ...         False           True
-50882       50882            2.7  ...         False           True
-1613         1613            2.7  ...         False           True
-
-[20 rows x 7 columns]
-
-======================================================================
-DATA VALUATION RECOMMENDATIONS
-======================================================================
-
-1. DATA EFFICIENCY:
-   - Top 70% of samples (by Shapley) achieve F1=0.6517
-   - Consider using top-K samples for resource-constrained settings
-
-2. NOISY LABELS (13829 samples):
-   - Recommend manual review of these samples:
-     - Sample 2 (Label: HAS FINDING, Shapley: -0.1000)
-     - Sample 3 (Label: NO FINDING, Shapley: -0.1000)
-     - Sample 5 (Label: HAS FINDING, Shapley: -0.2000)
-     - Sample 8 (Label: HAS FINDING, Shapley: -0.3000)
-     - Sample 9 (Label: NO FINDING, Shapley: -0.3000)
-     - Sample 32 (Label: HAS FINDING, Shapley: -0.1000)
-     - Sample 38 (Label: NO FINDING, Shapley: -0.3000)
-     - Sample 40 (Label: NO FINDING, Shapley: -0.8000)
-     - Sample 49 (Label: NO FINDING, Shapley: -0.1000)
-     - Sample 52 (Label: HAS FINDING, Shapley: -0.1000)
-     ... and 13819 more
-
-3. OUTLIERS (0 samples):
-   - These samples may be hard cases or edge cases
-   - Consider adding to hard example mining for future training
-
-4. REDUNDANT SAMPLES (36188 samples):
-   - Consider removing these from training to reduce data storage
-   - Expected performance impact: minimal
-
-5. HIGH-VALUE SAMPLES (6728 samples):
-   - Ensure these are preserved in any data cleaning/augmentation
-   - Use as seeds for active learning or sampling
-
-======================================================================
-
-============================================================
-SECTION 6: RETRAINING EXPERIMENTS
-============================================================
-Training samples: 71756
-Fractions: [0.2, 0.5, 0.8, 1.0]
-Strategies: top_k, bottom_k, random (x1 seeds)
-Total retraining runs: 12
-Epochs per run: 5 (patience=2)
-LR: 0.001, Weight decay: 1e-05
-Finetune all layers: False
-
-  [ 1/12] top_k     20% (14351 samples)  AUC=0.7157  F1=0.6566
-  [ 2/12] bottom_k  20% (14351 samples)  AUC=0.4694  F1=0.5974
-  [ 3/12] random    20% (14351 samples, seed=42)  AUC=0.7152  F1=0.6531
-  [ 4/12] top_k     50% (35878 samples)  AUC=0.7237  F1=0.6465
-  [ 5/12] bottom_k  50% (35878 samples)  AUC=0.7068  F1=0.6286
-  [ 6/12] random    50% (35878 samples, seed=42)  AUC=0.7219  F1=0.6586
