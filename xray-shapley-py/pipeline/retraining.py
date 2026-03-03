@@ -145,6 +145,37 @@ def run_retraining_experiments(
     for frac in fractions:
         k = max(1, int(n_train * frac))
 
+        # At 100% all strategies select the same samples — train once and
+        # reuse the result so the metrics are guaranteed identical.
+        if frac == 1.0:
+            all_indices = np.arange(n_train)
+            metrics = _retrain_and_evaluate(split, all_indices, device)
+            for strategy in ["top_k", "bottom_k"]:
+                run_idx += 1
+                print(
+                    f"  [{run_idx:2d}/{total_runs}] {strategy:<9s} {frac:.0%} ({k:4d} samples)"
+                    f"  AUC={metrics.auc_roc:.4f}  F1={metrics.f1:.4f}"
+                )
+                row = {"fraction": frac, "k": k, "strategy": strategy, "seed": None}
+                row.update(metrics.to_dict())
+                rows.append(row)
+            for seed_offset in range(config.RETRAIN_RANDOM_SEEDS):
+                run_idx += 1
+                seed_val = config.SEED + seed_offset
+                print(
+                    f"  [{run_idx:2d}/{total_runs}] random    {frac:.0%} ({k:4d} samples, seed={seed_val})"
+                    f"  AUC={metrics.auc_roc:.4f}  F1={metrics.f1:.4f}"
+                )
+                row = {
+                    "fraction": frac,
+                    "k": k,
+                    "strategy": "random",
+                    "seed": seed_val,
+                }
+                row.update(metrics.to_dict())
+                rows.append(row)
+            continue
+
         # --- Top-K ---
         run_idx += 1
         top_k_indices = sorted_indices[-k:]
