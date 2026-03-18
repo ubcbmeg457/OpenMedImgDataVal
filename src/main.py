@@ -1,5 +1,16 @@
+"""
+OpenMedImgDataVal: Medical Image Data Validation Pipeline
+
+Usage:
+    python src/main.py --modality xray --task class --dv ot   --input /path/to/data
+    python src/main.py --modality xray --task class --dv shap --input /path/to/data
+"""
+
 import argparse
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 def parse_args():
@@ -23,86 +34,77 @@ def parse_args():
         type=str,
         required=True,
         choices=["shap", "ot"],
-        help="Data valuation method: shap or ot (optimal transport)",
+        help="Data valuation method: shap (KNN-Shapley) or ot (optimal transport)",
     )
     parser.add_argument(
         "--input",
         type=str,
-        default=None,
-        help="Path to input data directory",
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default="output/",
-        help="Path to output directory (default: output/)",
+        required=True,
+        help="Path to input data directory.",
     )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    args.data_root = args.input
+    args.out_dir = os.path.join("output", args.modality, args.task, args.dv)
 
     print("=" * 60)
     print("OpenMedImgDataVal Pipeline")
     print("=" * 60)
-
-    # Step 1: Parse and display configuration
-    print("\n[Config]")
     print(f"  Modality : {args.modality}")
     print(f"  Task     : {args.task}")
     print(f"  DV Method: {args.dv}")
-    print(f"  Input    : {args.input or '(not specified — load data from default location)'}")
-    print(f"  Output   : {args.output}")
-
-    # Step 2: Resolve input data directory
-    # If --input is provided, load data from that directory.
-    # Otherwise, data should be placed in: data/<modality>/<task>/
-    if args.input:
-        input_dir = args.input
-    else:
-        input_dir = os.path.join("data", args.modality, args.task)
-    print(f"\n[Step 1] Load data from: {input_dir}")
-
-    # Step 3: Ensure output directory exists
-    output_dir = args.output
-    print(f"[Step 2] Output will be saved to: {output_dir}")
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Step 4: Load model for the given modality + task
-    if args.modality == "xray":
-        print("[Step 3] Loading X-ray image preprocessing pipeline")
-        if args.task == "seg":
-            print("  → Loading X-ray segmentation model (e.g., U-Net for lung/bone segmentation)")
-        elif args.task == "class":
-            print("  → Loading X-ray classification model (e.g., DenseNet for pathology detection)")
-    elif args.modality == "mri":
-        print("[Step 3] Loading MRI volume preprocessing pipeline")
-        if args.task == "seg":
-            print("  → Loading MRI segmentation model (e.g., 3D U-Net for organ/tumor segmentation)")
-        elif args.task == "class":
-            print("  → Loading MRI classification model (e.g., ResNet for disease classification)")
-
-    # Step 5: Run data valuation
-    if args.dv == "shap":
-        print("[Step 4] Running SHAP-based data valuation")
-        print("  → Computing Shapley values for each training sample")
-        print("  → Estimating marginal contribution via Monte Carlo sampling")
-    elif args.dv == "ot":
-        print("[Step 4] Running optimal transport data valuation")
-        print("  → Computing Wasserstein distances between data distributions")
-        print("  → Estimating sample transport costs")
-
-    # Step 6: Save results
-    print(f"[Step 5] Save results to {output_dir}")
-    if args.dv == "shap":
-        print(f"  → Writing Shapley value scores to {output_dir}")
-    elif args.dv == "ot":
-        print(f"  → Writing transport cost matrix to {output_dir}")
-
-    print("\n" + "=" * 60)
-    print("Pipeline complete.")
+    print(f"  Input    : {args.data_root}")
+    print(f"  Output   : {args.out_dir}")
     print("=" * 60)
+
+    if args.modality == "xray" and args.task == "class":
+        _run_xray_classification(args)
+    else:
+        print(f"\nERROR: Pipeline for --modality {args.modality} --task {args.task} is not yet implemented.")
+        print("Currently supported: --modality xray --task class")
+        sys.exit(1)
+
+
+def _run_xray_classification(args):
+    from pipelines.xray.common import run_valuation_pipeline
+
+    class _LazyMethodParams:
+        """Deferred so defaults are applied by the pipeline before formatting."""
+
+        def __init__(self, args):
+            self._args = args
+
+        def __str__(self):
+            a = self._args
+            if a.dv == "ot":
+                return f"ot_reg: {a.ot_reg}"
+            else:
+                lines = [
+                    f"shapley_mstar: {a.shapley_mstar}",
+                    f"shapley_batch_val: {a.shapley_batch_val}",
+                    f"k_candidates: {a.k_candidates}",
+                ]
+                out = "\n".join(lines)
+                if getattr(a, "_optimized_k", None) is not None:
+                    out += f"\noptimized_k (selected): {a._optimized_k}"
+                    if a._k_results:
+                        out += "\nk_optimization_results:"
+                        for kv, acc in sorted(a._k_results.items()):
+                            out += f"\n  k={kv}: val_acc={acc:.6f}"
+                return out
+
+    if args.dv == "ot":
+        from pipelines.xray.ot import compute_ot_values
+
+        run_valuation_pipeline(args, compute_ot_values, "OT", _LazyMethodParams(args))
+
+    elif args.dv == "shap":
+        from pipelines.xray.shap import compute_shapley_values
+
+        run_valuation_pipeline(args, compute_shapley_values, "Shapley", _LazyMethodParams(args))
 
 
 if __name__ == "__main__":
