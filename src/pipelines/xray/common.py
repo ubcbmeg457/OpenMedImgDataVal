@@ -294,7 +294,7 @@ def train_with_freeze_unfreeze_and_early_stop(model, train_loader, val_loader, d
 
     scheduler = None
     if args.use_scheduler:
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=2, verbose=True)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=2)
 
     best_val_auc = -1.0
     best_epoch = -1
@@ -329,9 +329,7 @@ def train_with_freeze_unfreeze_and_early_stop(model, train_loader, val_loader, d
             )
 
             if args.use_scheduler:
-                scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-                    optimizer, mode="max", factor=0.5, patience=2, verbose=True
-                )
+                scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=2)
 
         model.train()
         total_loss = 0.0

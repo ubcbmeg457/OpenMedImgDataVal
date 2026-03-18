@@ -15,9 +15,9 @@
 # First-time setup (run once on a login node):
 #   module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
 #   pip install uv
-#   cd ~/project/OpenMedImgDataVal && uv sync --all-packages --all-extras
+#   cd ~/scratch/OpenMedImgDataVal && uv sync --all-packages --all-extras
 #
-# Submit from the repo root:
+# Submit from the repo root (~/scratch/OpenMedImgDataVal):
 #   sbatch jobs/xray-class-ot.sh
 
 set -euo pipefail
