@@ -12,11 +12,6 @@
 # ---- Alliance Canada / Fir cluster — SLURM batch script ----
 # Runs: X-ray classification with Optimal Transport data valuation
 #
-# First-time setup (run once on a login node):
-#   module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
-#   pip install uv
-#   cd ~/scratch/OpenMedImgDataVal && uv sync --all-packages --all-extras
-#
 # Submit from the repo root (~/scratch/OpenMedImgDataVal):
 #   sbatch jobs/xray-class-ot.sh
 
@@ -32,9 +27,15 @@ module purge
 module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
 
 # ---------------------------------------------------------------------------
-# Run the pipeline using the uv-managed venv
+# Install dependencies (idempotent — skips if already up to date)
 # ---------------------------------------------------------------------------
 cd "$PROJECT_DIR"
+pip install --quiet uv
+uv sync --all-packages --all-extras
+
+# ---------------------------------------------------------------------------
+# Run the pipeline
+# ---------------------------------------------------------------------------
 source "$PROJECT_DIR/.venv/bin/activate"
 
 echo "=== Job $SLURM_JOB_ID started on $(hostname) at $(date) ==="
