@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["prototype", "xray-shapley-nb", "xray-shapley-py"]
+members = ["prototype", "xray-shapley-nb", "xray-shapley-py", "src"]
 
 [project]
 name = "openmedimgdataval"
