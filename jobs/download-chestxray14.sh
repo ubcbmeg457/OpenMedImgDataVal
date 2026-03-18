@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=dl-chestxray14
-#SBATCH --account=rrg-timsbc_gpu
+#SBATCH --account=def-timsbc
 #SBATCH --partition=cpubase_bycore_b2
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
