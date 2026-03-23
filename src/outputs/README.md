@@ -44,4 +44,4 @@ outputs/
 
 - Model checkpoints (`.pt`) and embeddings (`.npz`) are large and should not be committed to git.
 - Plots (`.png`), CSVs, and reports are small and safe to track.
-- Both pipelines share Sections 1-3 and 5; only Section 4 (data valuation method) differs. See [pipeline architecture](../src/README.md).
+- Both pipelines share Sections 1-3 and 5; only Section 4 (data valuation method) differs. See [pipeline architecture](../README.md).
