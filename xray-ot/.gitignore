@@ -1,9 +1,0 @@
-# Large regenerable outputs
-outputs/*.pt
-outputs/*.npy
-
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-.DS_Store

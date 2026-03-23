@@ -3,14 +3,14 @@
 #SBATCH --account=rrg-timsbc_gpu
 #SBATCH --partition=gpubase_bygpu_b2
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=128G
+#SBATCH --time=48:00:00
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 
 # ---- Alliance Canada / Fir cluster — SLURM batch script ----
-# Runs: X-ray classification with Optimal Transport data valuation
+# Runs: X-ray multi-label classification with Optimal Transport data valuation
 #
 # Submit from the repo root (~/scratch/OpenMedImgDataVal):
 #   sbatch jobs/xray-class-ot.sh
@@ -18,7 +18,6 @@
 set -euo pipefail
 
 PROJECT_DIR=~/scratch/OpenMedImgDataVal
-DATA_DIR=~/scratch/data/chestxray14
 
 # ---------------------------------------------------------------------------
 # Modules
@@ -45,6 +44,6 @@ echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available()
 echo "GPU: $(python -c 'import torch; print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")')"
 echo ""
 
-python src/main.py --modality xray --task class --dv ot --input "$DATA_DIR"
+python src/main.py --modality xray --task class --dv ot
 
 echo "=== Job finished at $(date) ==="

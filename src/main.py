@@ -2,8 +2,8 @@
 OpenMedImgDataVal: Medical Image Data Validation Pipeline
 
 Usage:
-    python src/main.py --modality xray --task class --dv ot   --input /path/to/data
-    python src/main.py --modality xray --task class --dv shap --input /path/to/data
+    python src/main.py --modality xray --task class --dv shap
+    python src/main.py --modality xray --task class --dv ot
 """
 
 import argparse
@@ -36,18 +36,11 @@ def parse_args():
         choices=["shap", "ot"],
         help="Data valuation method: shap (KNN-Shapley) or ot (optimal transport)",
     )
-    parser.add_argument(
-        "--input",
-        type=str,
-        required=True,
-        help="Path to input data directory.",
-    )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    args.data_root = args.input
     args.out_dir = os.path.join("output", args.modality, args.task, args.dv)
 
     print("=" * 60)
@@ -56,7 +49,6 @@ def main():
     print(f"  Modality : {args.modality}")
     print(f"  Task     : {args.task}")
     print(f"  DV Method: {args.dv}")
-    print(f"  Input    : {args.data_root}")
     print(f"  Output   : {args.out_dir}")
     print("=" * 60)
 
@@ -69,7 +61,7 @@ def main():
 
 
 def _run_xray_classification(args):
-    from pipelines.xray.common import run_valuation_pipeline
+    from xray_class.pipeline import run_pipeline
 
     class _LazyMethodParams:
         """Deferred so defaults are applied by the pipeline before formatting."""
@@ -81,30 +73,29 @@ def _run_xray_classification(args):
             a = self._args
             if a.dv == "ot":
                 return f"ot_reg: {a.ot_reg}"
-            else:
-                lines = [
-                    f"shapley_mstar: {a.shapley_mstar}",
-                    f"shapley_batch_val: {a.shapley_batch_val}",
-                    f"k_candidates: {a.k_candidates}",
-                ]
-                out = "\n".join(lines)
-                if getattr(a, "_optimized_k", None) is not None:
-                    out += f"\noptimized_k (selected): {a._optimized_k}"
-                    if a._k_results:
-                        out += "\nk_optimization_results:"
-                        for kv, acc in sorted(a._k_results.items()):
-                            out += f"\n  k={kv}: val_acc={acc:.6f}"
-                return out
+            lines = [
+                f"shapley_mstar: {a.shapley_mstar}",
+                f"shapley_batch_val: {a.shapley_batch_val}",
+                f"k_candidates: {a.k_candidates}",
+            ]
+            out = "\n".join(lines)
+            if getattr(a, "_optimized_k", None) is not None:
+                out += f"\noptimized_k (selected): {a._optimized_k}"
+                if a._k_results:
+                    out += "\nk_optimization_results:"
+                    for kv, acc in sorted(a._k_results.items()):
+                        out += f"\n  k={kv}: val_acc={acc:.6f}"
+            return out
 
     if args.dv == "ot":
-        from pipelines.xray.ot import compute_ot_values
+        from dv.ot.sinkhorn import compute_ot_values
 
-        run_valuation_pipeline(args, compute_ot_values, "OT", _LazyMethodParams(args))
+        run_pipeline(args, compute_ot_values, "OT", _LazyMethodParams(args))
 
     elif args.dv == "shap":
-        from pipelines.xray.shap import compute_shapley_values
+        from dv.shap.knn_shapley import compute_shapley_values
 
-        run_valuation_pipeline(args, compute_shapley_values, "Shapley", _LazyMethodParams(args))
+        run_pipeline(args, compute_shapley_values, "Shapley", _LazyMethodParams(args))
 
 
 if __name__ == "__main__":
