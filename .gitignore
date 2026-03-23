@@ -3,4 +3,10 @@
 *data/
 .vscode/
 *.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+*.pt
+*.npz
+*.npy
+.DS_Store
 
