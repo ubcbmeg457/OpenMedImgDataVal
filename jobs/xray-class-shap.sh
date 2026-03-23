@@ -2,10 +2,10 @@
 #SBATCH --job-name=xray-class-shap
 #SBATCH --account=rrg-timsbc_gpu
 #SBATCH --partition=gpubase_bygpu_b2
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:h100:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
-#SBATCH --time=48:00:00
+#SBATCH --time=12:00:00
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 
