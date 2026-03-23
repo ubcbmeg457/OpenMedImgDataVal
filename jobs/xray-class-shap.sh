@@ -2,7 +2,7 @@
 #SBATCH --job-name=xray-class-shap
 #SBATCH --account=rrg-timsbc_gpu
 #SBATCH --partition=gpubase_bygpu_b2
-#SBATCH --gres=gpu:h100:1
+#SBATCH --gres=gpu:nvidia_h100_80gb_hbm3_3g.40gb:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=12:00:00

@@ -35,7 +35,7 @@ matplotlib.use("Agg")
 # Pipeline defaults
 # ──────────────────────────────────────────────────────────────────────
 PIPELINE_DEFAULTS = {
-    "epochs": 50,
+    "epochs": 30,
     "batch_size": 32,
     "num_workers": 8,
     "early_stop_patience": 5,
