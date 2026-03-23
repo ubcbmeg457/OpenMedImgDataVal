@@ -41,7 +41,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    args.out_dir = os.path.join("output", args.modality, args.task, args.dv)
+    args.out_dir = os.path.join("outputs", args.modality, args.task, args.dv)
 
     print("=" * 60)
     print("OpenMedImgDataVal Pipeline")

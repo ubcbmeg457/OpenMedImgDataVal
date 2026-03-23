@@ -22,7 +22,6 @@ from xray_class.model import (
     compute_multilabel_auc,
     evaluate_multilabel,
     extract_embeddings,
-    plot_auc_vs_size,
     plot_curve,
     plot_hist,
     plot_retraining_curves,
@@ -407,7 +406,7 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
     for rank, idx in enumerate(bottom_idx[:10], 1):
         print(f"  {rank}. {train_filenames[idx]}: {v[idx]:.6f}")
 
-    # ── Section 5: Subset retraining experiments (Top-K, Bottom-K, Random-K) ──
+    # ── Section 5: Subset retraining experiments (Top-N, Bottom-N, Random-N) ──
     print("\n" + "=" * 60)
     print("SECTION 5: SUBSET RETRAINING EXPERIMENTS")
     print("=" * 60)
@@ -419,7 +418,7 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
     n_train_total = len(train_set)
 
     print(f"Fractions: {[int(f * 100) for f in subset_fracs]}%")
-    print(f"Strategies: Top-K, Bottom-K, Random-K (x{n_random_seeds} seeds)")
+    print(f"Strategies: Top-N, Bottom-N, Random-N (x{n_random_seeds} seeds)")
 
     baseline = {
         "direction": "baseline",
@@ -449,7 +448,7 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
         n_keep = max(1, int(round(frac * n_train_total)))
         pct = int(frac * 100)
 
-        # Top-K
+        # Top-N
         print(f"\n--- Top-{pct}% ({n_keep} samples) ---")
         top_res = _train_and_eval_subset(
             order_desc[:n_keep].tolist(),
@@ -467,7 +466,7 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
         top_res["seed"] = args.seed
         top_results.append(top_res)
 
-        # Bottom-K
+        # Bottom-N
         print(f"\n--- Bottom-{pct}% ({n_keep} samples) ---")
         bottom_res = _train_and_eval_subset(
             order_asc_full[:n_keep].tolist(),
@@ -485,7 +484,7 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
         bottom_res["seed"] = args.seed
         bottom_results.append(bottom_res)
 
-        # Random-K (multiple seeds for error bars)
+        # Random-N (multiple seeds for error bars)
         random_by_frac[frac] = []
         for seed_i in range(n_random_seeds):
             rng_seed = args.seed + seed_i + 1
@@ -548,14 +547,6 @@ def _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, meth
         random_std_metrics[k] = stds
 
     # Plots
-    plot_auc_vs_size(
-        fracs_pct,
-        top_metrics["test_auc"],
-        bottom_metrics["test_auc"],
-        "Test AUC vs Training Data Kept",
-        method_name,
-        os.path.join(args.out_dir, "subset_test_auc_vs_size.png"),
-    )
     plot_retraining_curves(
         fracs_pct,
         top_metrics,

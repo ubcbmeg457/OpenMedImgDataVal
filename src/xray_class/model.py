@@ -277,7 +277,7 @@ def plot_auc_vs_size(xs_pct, ys_top, ys_bottom, title, method_name, out_path):
 def plot_retraining_curves(fracs_pct, top_aucs, bottom_aucs, random_mean, random_std, method_name, out_dir):
     """
     Two-panel retraining plot: AUC-ROC and Loss.
-    Top-K, Bottom-K as solid lines; Random-K as line with shaded +/-1 std band.
+    Top-N, Bottom-N as solid lines; Random-N as line with shaded +/-1 std band.
     """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 

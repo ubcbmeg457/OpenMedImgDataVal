@@ -12,7 +12,7 @@ graph TD
     Embed --> SHAP["Section 4a: KNN-Shapley<br/>dv/shap/"]
     Embed --> OT["Section 4b: Optimal Transport<br/>dv/ot/ (POT Sinkhorn)"]
 
-    SHAP --> Retrain["Section 5: Subset Retraining<br/>Top-K / Bottom-K / Random-K<br/>20%–90% retention"]
+    SHAP --> Retrain["Section 5: Subset Retraining<br/>Top-N / Bottom-N / Random-N<br/>20%–90% retention"]
     OT --> Retrain
 
     Retrain --> Out["Outputs<br/>report, plots, CSVs, model"]
