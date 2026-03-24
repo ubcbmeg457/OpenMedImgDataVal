@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 
-import kagglehub
 import numpy as np
 import pandas as pd
 import torch
@@ -15,7 +14,10 @@ from xray_class import config
 
 def download_dataset():
     """Download full NIH CXR14 via kagglehub. Returns the path to the dataset."""
+    # Set env var BEFORE importing kagglehub — it reads KAGGLE_CACHE_DIR at import time
     os.environ["KAGGLE_CACHE_DIR"] = str(config.DEFAULT_DATA_DIR)
+    import kagglehub
+
     print(f"KAGGLE_CACHE_DIR = {os.environ['KAGGLE_CACHE_DIR']}")
     print(f"Downloading {config.KAGGLE_DATASET} via kagglehub...")
     path = kagglehub.dataset_download(config.KAGGLE_DATASET)

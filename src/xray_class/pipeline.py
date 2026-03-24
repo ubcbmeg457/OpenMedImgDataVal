@@ -37,16 +37,16 @@ matplotlib.use("Agg")
 PIPELINE_DEFAULTS = {
     "epochs": 30,
     "batch_size": 32,
-    "num_workers": 8,
+    "num_workers": 4,
     "early_stop_patience": 5,
     "pretrained_path": None,
     "torch_home": None,
     "seed": 42,
     "val_frac": 0.1,
     "test_frac": 0.1,
-    "subset_fracs": "0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90",
+    "subset_fracs": "0.20,0.40,0.60,0.80",
     "random_seeds": 1,
-    "subset_epochs": 15,
+    "subset_epochs": 10,
     "dropout": 0.4,
     "freeze_backbone": True,
     "unfreeze_last_block": True,
@@ -70,8 +70,8 @@ HPO_SEARCH_SPACE = {
     "weight_decay_finetune": [1e-4, 3e-4, 5e-4, 1e-3],
     "unfreeze_epoch": [3, 4, 5, 6, 8],
 }
-HPO_N_TRIALS = 10
-HPO_EPOCHS = 15
+HPO_N_TRIALS = 5
+HPO_EPOCHS = 10
 
 
 # ──────────────────────────────────────────────────────────────────────
