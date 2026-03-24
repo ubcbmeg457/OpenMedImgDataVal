@@ -77,7 +77,7 @@ def _run_xray_classification(args):
             lines = [
                 f"shapley_mstar: {a.shapley_mstar}",
                 f"shapley_batch_val: {a.shapley_batch_val}",
-                f"k_candidates: {a.k_candidates}",
+                f"k_candidates: {a.shapley_k_candidates}",
             ]
             out = "\n".join(lines)
             if getattr(a, "_optimized_k", None) is not None:

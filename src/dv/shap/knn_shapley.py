@@ -32,7 +32,7 @@ def knn_accuracy(train_feats, train_y, val_feats, val_y, k):
     _, topk_idx = torch.topk(sim, k=k_eff, dim=1)
 
     train_labels = train_y.round().long()
-    topk_labels = train_labels[topk_idx]  # [n_val, k, n_classes]
+    topk_labels = train_labels[topk_idx.cpu()]  # [n_val, k, n_classes]
     preds = (topk_labels.float().mean(dim=1) >= 0.5).long()  # [n_val, n_classes]
     val_labels = val_y.round().long()
 
@@ -135,7 +135,7 @@ def knn_shapley_values_embeddings(train_feats, train_y, val_feats, val_y, k=10, 
 
 def compute_shapley_values(train_feats, train_y, val_feats, val_y, args):
     """compute_values_fn adapter for the pipeline."""
-    candidates = [int(c) for c in args.k_candidates.split(",") if c.strip()]
+    candidates = [int(c) for c in args.shapley_k_candidates.split(",") if c.strip()]
     print("Optimising KNN k value...")
     best_k, k_results = optimize_knn_k(train_feats, train_y, val_feats, val_y, candidates, out_dir=args.out_dir)
     args._optimized_k = best_k

@@ -35,18 +35,18 @@ matplotlib.use("Agg")
 # Pipeline defaults
 # ──────────────────────────────────────────────────────────────────────
 PIPELINE_DEFAULTS = {
-    "epochs": 30,
+    "epochs": 20,
     "batch_size": 32,
     "num_workers": 10,
-    "early_stop_patience": 5,
+    "early_stop_patience": 3,
     "pretrained_path": None,
     "torch_home": None,
     "seed": 42,
     "val_frac": 0.1,
     "test_frac": 0.1,
-    "subset_fracs": "0.20,0.50,0.80",
+    "subset_fracs": "0.90,0.80,0.70,0.50,0.30",
     "random_seeds": 1,
-    "subset_epochs": 5,
+    "subset_epochs": 3,
     "dropout": 0.4,
     "freeze_backbone": True,
     "unfreeze_last_block": True,
@@ -57,10 +57,9 @@ PIPELINE_DEFAULTS = {
     "weight_decay_finetune": 5e-4,
     "use_scheduler": True,
     "ot_reg": 0.01,
-    "shapley_k": 10,
     "shapley_mstar": 5000,
     "shapley_batch_val": 32,
-    "k_candidates": "1,3,5,10,20,50",
+    "shapley_k_candidates": "1,3,5,10,20,50",
 }
 
 HPO_SEARCH_SPACE = {
@@ -70,7 +69,7 @@ HPO_SEARCH_SPACE = {
     "weight_decay_finetune": [1e-4, 3e-4, 5e-4, 1e-3],
     "unfreeze_epoch": [3, 4, 5, 6, 8],
 }
-HPO_N_TRIALS = 5
+HPO_N_TRIALS = 3
 HPO_EPOCHS = 10
 
 

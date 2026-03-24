@@ -189,6 +189,7 @@ def train_with_early_stop(model, train_loader, val_loader, device, args, run_nam
             best_val_auc = val_auc
             best_epoch = epoch_num
             patience_counter = 0
+            os.makedirs(os.path.dirname(best_path), exist_ok=True)
             torch.save(model.state_dict(), best_path)
         else:
             patience_counter += 1
