@@ -1,0 +1,53 @@
+=== Job 29210196 started on fc10518 at Mon Mar 23 11:02:48 PM PDT 2026 ===
+Python: Python 3.11.5
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU: NVIDIA H100 80GB HBM3
+
+============================================================
+OpenMedImgDataVal Pipeline
+============================================================
+  Modality : xray
+  Task     : class
+  DV Method: shap
+  Output   : /scratch/jsiu/OpenMedImgDataVal/src/outputs/xray/class/shap
+============================================================
+Device: cuda
+Classification: Multi-label (14 classes)
+
+============================================================
+SECTION 1: DATA DOWNLOAD
+============================================================
+KAGGLE_CACHE_DIR = /scratch/jsiu/OpenMedImgDataVal/src/data
+Downloading nih-chest-xrays/data via kagglehub...
+Dataset path: /home/jsiu/.cache/kagglehub/datasets/nih-chest-xrays/data/versions/3
+Indexed 112120 images
+Loaded 112120 images (0 skipped — not found on disk)
+Train: 89696, Val: 11212, Test: 11212
+Classes: 14 (Atelectasis, Cardiomegaly, Effusion, Infiltration, Mass, Nodule, Pneumonia, Pneumothorax, Consolidation, Edema, Emphysema, Fibrosis, Pleural_Thickening, Hernia)
+
+============================================================
+SECTION 2: HYPERPARAMETER OPTIMISATION
+============================================================
+
+============================================================
+Hyperparameter Optimisation (5 trials, 10 epochs each)
+============================================================
+[hpo_trial_0] Epoch 1/10 | lr=3.00e-04 | train_loss=0.1806 | val_loss=0.1709 val_auc=0.6929
+[hpo_trial_0] Epoch 2/10 | lr=3.00e-04 | train_loss=0.1743 | val_loss=0.1694 val_auc=0.7188
+[hpo_trial_0] Epoch 3/10 | lr=3.00e-04 | train_loss=0.1739 | val_loss=0.1703 val_auc=0.7245
+[hpo_trial_0] Unfreezing denseblock4 + norm5 at epoch 4
+[hpo_trial_0] Epoch 4/10 | lr=3.00e-05 | train_loss=0.1683 | val_loss=0.1612 val_auc=0.7726
+[hpo_trial_0] Epoch 5/10 | lr=3.00e-05 | train_loss=0.1637 | val_loss=0.1588 val_auc=0.7861
+[hpo_trial_0] Epoch 6/10 | lr=3.00e-05 | train_loss=0.1611 | val_loss=0.1574 val_auc=0.7921
+[hpo_trial_0] Epoch 7/10 | lr=3.00e-05 | train_loss=0.1593 | val_loss=0.1566 val_auc=0.7955
+[hpo_trial_0] Epoch 8/10 | lr=3.00e-05 | train_loss=0.1580 | val_loss=0.1556 val_auc=0.7996
+[hpo_trial_0] Epoch 9/10 | lr=3.00e-05 | train_loss=0.1565 | val_loss=0.1552 val_auc=0.8033
+[hpo_trial_0] Epoch 10/10 | lr=3.00e-05 | train_loss=0.1556 | val_loss=0.1542 val_auc=0.8071
+  Trial 1/5 | val_auc=0.8071 *best* | head_lr=3.0e-04 finetune_lr=3.0e-05 dropout=0.4 wd_ft=3.0e-04 unfreeze_ep=4
+[hpo_trial_1] Epoch 1/10 | lr=5.00e-04 | train_loss=0.1764 | val_loss=0.1710 val_auc=0.7149
+[hpo_trial_1] Epoch 2/10 | lr=5.00e-04 | train_loss=0.1721 | val_loss=0.1691 val_auc=0.7253
+[hpo_trial_1] Unfreezing denseblock4 + norm5 at epoch 3
+[hpo_trial_1] Epoch 3/10 | lr=3.00e-05 | train_loss=0.1660 | val_loss=0.1608 val_auc=0.7717
+[hpo_trial_1] Epoch 4/10 | lr=3.00e-05 | train_loss=0.1620 | val_loss=0.1587 val_auc=0.7833
+[hpo_trial_1] Epoch 5/10 | lr=3.00e-05 | train_loss=0.1597 | val_loss=0.1574 val_auc=0.7897
