@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=xray-class-shap
 #SBATCH --account=rrg-timsbc
-#SBATCH --gres=gpu:h100:1
+#SBATCH --gres=gpu:nvidia_h100_80gb_hbm3_3g.40gb:1
 #SBATCH --cpus-per-task=12
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --time=24:00:00
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
