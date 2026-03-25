@@ -37,7 +37,7 @@ matplotlib.use("Agg")
 PIPELINE_DEFAULTS = {
     "epochs": 20,
     "batch_size": 32,
-    "num_workers": 10,
+    "num_workers": 8,
     "early_stop_patience": 3,
     "pretrained_path": None,
     "torch_home": None,
@@ -46,7 +46,7 @@ PIPELINE_DEFAULTS = {
     "test_frac": 0.1,
     "subset_fracs": "0.90,0.80,0.70,0.50,0.30",
     "random_seeds": 1,
-    "subset_epochs": 3,
+    "subset_epochs": 8,
     "dropout": 0.4,
     "freeze_backbone": True,
     "unfreeze_last_block": True,
@@ -118,6 +118,7 @@ def _train_and_eval_subset(
 
     sub_args = copy.copy(args)
     sub_args.epochs = args.subset_epochs
+    sub_args.unfreeze_epoch = min(args.unfreeze_epoch, max(1, args.subset_epochs // 3))
 
     sub_model = build_model(sub_args, device)
     sub_model, _, _, sub_best_epoch, sub_best_val_auc = train_with_early_stop(
