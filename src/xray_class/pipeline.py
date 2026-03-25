@@ -37,7 +37,7 @@ matplotlib.use("Agg")
 PIPELINE_DEFAULTS = {
     "epochs": 20,
     "batch_size": 32,
-    "num_workers": 8,
+    "num_workers": 4,
     "early_stop_patience": 3,
     "pretrained_path": None,
     "torch_home": None,

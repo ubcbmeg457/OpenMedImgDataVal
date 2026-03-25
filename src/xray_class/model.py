@@ -207,15 +207,11 @@ def train_with_early_stop(model, train_loader, val_loader, device, args, run_nam
 # ──────────────────────────────────────────────────────────────────────
 def extract_embeddings(model, dataset, args, device):
     """Extract 1024-dim DenseNet121 feature embeddings."""
-    feature_model = models.densenet121(weights=None)
-    feature_model.features = model.features
-    feature_model.classifier = nn.Identity()
-    feature_model = feature_model.to(device)
-    feature_model.eval()
+    model.eval()
 
     @torch.no_grad()
     def forward_features(x):
-        f = feature_model.features(x)
+        f = model.features(x)
         f = nn.functional.relu(f, inplace=False)
         f = nn.functional.adaptive_avg_pool2d(f, (1, 1)).flatten(1)
         return f
@@ -227,7 +223,7 @@ def extract_embeddings(model, dataset, args, device):
     feats, ys = [], []
     for x, y in loader:
         x = x.to(device, non_blocking=True)
-        feats.append(forward_features(x))
+        feats.append(forward_features(x).cpu())
         ys.append(y)
 
     return torch.cat(feats, dim=0), torch.cat(ys, dim=0)
