@@ -18,7 +18,7 @@ def ot_multilabel(train_feats, train_y, val_feats, val_y, reg=0.01, eps=1e-12):
     Compute per-training-sample OT scores using Sinkhorn transport.
 
     Cost: cosine distance between embeddings.
-    Reward: mean per-class label agreement (fraction of matching classes).
+    Reward: Jaccard similarity of positive labels (ignores true negatives).
     """
     train_feats = nn.functional.normalize(train_feats, dim=1)
     val_feats = nn.functional.normalize(val_feats, dim=1)
@@ -27,7 +27,13 @@ def ot_multilabel(train_feats, train_y, val_feats, val_y, reg=0.01, eps=1e-12):
 
     train_labels = train_y.round()
     val_labels = val_y.round()
-    R = (train_labels.unsqueeze(1) == val_labels.unsqueeze(0)).float().mean(dim=2)
+    a_lab = train_labels.unsqueeze(1)  # [n_train, 1, n_classes]
+    b_lab = val_labels.unsqueeze(0)  # [1, n_val, n_classes]
+    intersection = (a_lab * b_lab).sum(dim=2)
+    union = ((a_lab + b_lab) > 0).float().sum(dim=2)
+    both_zero = (a_lab.sum(dim=2) == 0) & (b_lab.sum(dim=2) == 0)
+    R = intersection / union.clamp_min(1.0)
+    R[both_zero] = 1.0
 
     n_train = train_feats.size(0)
     n_val = val_feats.size(0)

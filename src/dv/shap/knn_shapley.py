@@ -116,8 +116,15 @@ def knn_shapley_values_embeddings(train_feats, train_y, val_feats, val_y, k=10, 
             Np = len(idx_sorted)
             K_eff = min(K, Np)
 
-            # Per-position agreement: fraction of matching classes
-            agreement = (lab == y_val_j.unsqueeze(0)).float().mean(dim=1).numpy()
+            # Per-position agreement: Jaccard similarity of positive labels
+            a_lab = lab
+            b_lab = y_val_j.unsqueeze(0)
+            inter = (a_lab * b_lab).sum(dim=1)
+            union = ((a_lab + b_lab) > 0).float().sum(dim=1)
+            both_zero = (a_lab.sum(dim=1) == 0) & (b_lab.sum(dim=1) == 0)
+            agreement = inter / union.clamp_min(1.0)
+            agreement[both_zero] = 1.0
+            agreement = agreement.numpy()
 
             s_next = agreement[Np - 1] / float(Np)
             shapley[idx_sorted[Np - 1]] += s_next
