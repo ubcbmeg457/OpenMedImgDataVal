@@ -6,7 +6,6 @@ requires-python = "==3.11.*"
 members = [
     "openmedimgdataval",
     "openmedimgdataval-pipelines",
-    "prototype",
 ]
 
 [[package]]
