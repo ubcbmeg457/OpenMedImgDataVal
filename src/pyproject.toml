@@ -18,9 +18,11 @@ dependencies = [
 
     # Data download
     "kagglehub>=0.2.0",
+    "synapseclient>=4.0.0",
 
     # Data / Imaging
     "Pillow>=10.0.0",
+    "nibabel>=5.0.0",
 
     # Visualization
     "matplotlib>=3.7.0",

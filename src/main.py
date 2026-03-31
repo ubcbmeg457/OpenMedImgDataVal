@@ -55,14 +55,54 @@ def main():
 
     if args.modality == "xray" and args.task == "class":
         _run_xray_classification(args)
+    elif args.modality == "mri" and args.task == "seg":
+        _run_mri_segmentation(args)
     else:
         print(f"\nERROR: Pipeline for --modality {args.modality} --task {args.task} is not yet implemented.")
-        print("Currently supported: --modality xray --task class")
+        print("Currently supported: --modality xray --task class | --modality mri --task seg")
         sys.exit(1)
 
 
 def _run_xray_classification(args):
     from xray_class.pipeline import run_pipeline
+
+    class _LazyMethodParams:
+        """Deferred so defaults are applied by the pipeline before formatting."""
+
+        def __init__(self, args):
+            self._args = args
+
+        def __str__(self):
+            a = self._args
+            if a.dv == "ot":
+                return f"ot_reg: {a.ot_reg}"
+            lines = [
+                f"shapley_mstar: {a.shapley_mstar}",
+                f"shapley_batch_val: {a.shapley_batch_val}",
+                f"k_candidates: {a.shapley_k_candidates}",
+            ]
+            out = "\n".join(lines)
+            if getattr(a, "_optimized_k", None) is not None:
+                out += f"\noptimized_k (selected): {a._optimized_k}"
+                if a._k_results:
+                    out += "\nk_optimization_results:"
+                    for kv, acc in sorted(a._k_results.items()):
+                        out += f"\n  k={kv}: val_acc={acc:.6f}"
+            return out
+
+    if args.dv == "ot":
+        from dv.ot.sinkhorn import compute_ot_values
+
+        run_pipeline(args, compute_ot_values, "OT", _LazyMethodParams(args))
+
+    elif args.dv == "shap":
+        from dv.shap.knn_shapley import compute_shapley_values
+
+        run_pipeline(args, compute_shapley_values, "Shapley", _LazyMethodParams(args))
+
+
+def _run_mri_segmentation(args):
+    from mri_seg.pipeline import run_pipeline
 
     class _LazyMethodParams:
         """Deferred so defaults are applied by the pipeline before formatting."""

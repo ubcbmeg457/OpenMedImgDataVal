@@ -1,0 +1,48 @@
+#!/bin/bash
+#SBATCH --job-name=mri-seg-shap
+#SBATCH --account=rrg-timsbc
+#SBATCH --gres=gpu:nvidia_h100_80gb_hbm3_3g.40gb:1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=64G
+#SBATCH --time=24:00:00
+#SBATCH --output=%x-%j.out
+#SBATCH --error=%x-%j.err
+
+# ---- Alliance Canada / Fir cluster — SLURM batch script ----
+# Runs: MRI 2D binary segmentation with KNN-Shapley data valuation
+#
+# Submit from the repo root (~/scratch/OpenMedImgDataVal):
+#   sbatch jobs/mri-seg-shap.sh
+
+set -euo pipefail
+
+PROJECT_DIR=~/scratch/OpenMedImgDataVal
+
+# ---------------------------------------------------------------------------
+# Modules
+# ---------------------------------------------------------------------------
+module purge
+module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
+
+# ---------------------------------------------------------------------------
+# Install dependencies (idempotent — skips if already up to date)
+# ---------------------------------------------------------------------------
+cd "$PROJECT_DIR"
+pip install --quiet uv
+uv sync --all-packages --all-extras
+
+# ---------------------------------------------------------------------------
+# Run the pipeline
+# ---------------------------------------------------------------------------
+source "$PROJECT_DIR/.venv/bin/activate"
+
+echo "=== Job $SLURM_JOB_ID started on $(hostname) at $(date) ==="
+echo "Python: $(python --version)"
+echo "PyTorch: $(python -c 'import torch; print(torch.__version__)')"
+echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available())')"
+echo "GPU: $(python -c 'import torch; print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")')"
+echo ""
+
+python src/main.py --modality mri --task seg --dv shap
+
+echo "=== Job finished at $(date) ==="
