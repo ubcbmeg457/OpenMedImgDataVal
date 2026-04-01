@@ -19,6 +19,7 @@ dependencies = [
     # Data download
     "kagglehub>=0.2.0",
     "synapseclient>=4.0.0",
+    "python-dotenv>=1.0.0",
 
     # Data / Imaging
     "Pillow>=10.0.0",

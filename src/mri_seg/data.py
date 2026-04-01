@@ -33,9 +33,15 @@ def download_dataset(data_dir=None):
 
     import synapseclient
     import synapseutils
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    auth_token = os.environ.get("SYNAPSE_AUTH_TOKEN")
+    if not auth_token:
+        raise RuntimeError("SYNAPSE_AUTH_TOKEN not set. Add it to your .env file.")
 
     syn = synapseclient.Synapse()
-    syn.login()
+    syn.login(authToken=auth_token)
 
     print(f"Downloading BraTS 2023 (Synapse: {config.SYNAPSE_DATASET_ID})...")
     synapseutils.syncFromSynapse(syn, config.SYNAPSE_DATASET_ID, path=str(raw_dir))
