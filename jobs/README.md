@@ -4,21 +4,12 @@ SLURM batch scripts for running pipelines on Alliance Canada / Fir cluster.
 
 ## Synapse Authentication
 
-The MRI segmentation pipeline downloads data from Synapse and requires authentication. Set this up before submitting jobs.
+The MRI segmentation pipeline downloads data from Synapse and requires authentication. Set up the `.env` file with your credentials before submitting jobs.
 
-1. Copy `.env.example` to `.env` at the project root and fill in your token:
+```bash
+cp .env.example .env
+```
 
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Generate a personal access token at [synapse.org](https://www.synapse.org/) under **Account Settings > Personal Access Tokens**. Ensure the token has download permissions for the required dataset.
-
-3. Add your token to `.env`:
-
-   ```
-   SYNAPSE_AUTH_TOKEN=<your-synapse-personal-access-token>
-   ```
 ## Submitting Jobs
 
 ```bash
