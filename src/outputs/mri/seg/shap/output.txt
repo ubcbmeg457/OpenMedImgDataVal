@@ -1,0 +1,7 @@
+Device: cuda
+Segmentation: Binary (tumor vs background)
+DV labels: 3 tumor types (NCR, ED, ET)
+
+============================================================
+SECTION 1: DATA DOWNLOAD & PREPROCESSING
+============================================================

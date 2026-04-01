@@ -1,0 +1,21 @@
+=== Job 30607309 started on fc10910 at Mon Mar 30 09:11:51 PM PDT 2026 ===
+Python: Python 3.11.5
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU: NVIDIA H100 80GB HBM3 MIG 3g.40gb
+
+============================================================
+OpenMedImgDataVal Pipeline
+============================================================
+  Modality : mri
+  Task     : seg
+  DV Method: shap
+  Output   : /scratch/jsiu/OpenMedImgDataVal/src/outputs/mri/seg/shap
+============================================================
+Device: cuda
+Segmentation: Binary (tumor vs background)
+DV labels: 3 tumor types (NCR, ED, ET)
+
+============================================================
+SECTION 1: DATA DOWNLOAD & PREPROCESSING
+============================================================

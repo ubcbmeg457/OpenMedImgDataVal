@@ -1,3 +1,17 @@
+=== Job 30600568 started on fc10909 at Mon Mar 30 05:10:35 PM PDT 2026 ===
+Python: Python 3.11.5
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU: NVIDIA H100 80GB HBM3 MIG 3g.40gb
+
+============================================================
+OpenMedImgDataVal Pipeline
+============================================================
+  Modality : xray
+  Task     : class
+  DV Method: shap
+  Output   : /scratch/jsiu/OpenMedImgDataVal/src/outputs/xray/class/shap
+============================================================
 Device: cuda
 Classification: Multi-label (14 classes)
 
@@ -321,3 +335,4 @@ Strategies: Top-N, Bottom-N, Random-N (x1 seeds)
 Pipeline completed in 893.7 minutes.
 Outputs saved to: /scratch/jsiu/OpenMedImgDataVal/src/outputs/xray/class/shap
 Report: /scratch/jsiu/OpenMedImgDataVal/src/outputs/xray/class/shap/final_report.txt
+=== Job finished at Tue Mar 31 08:08:07 AM PDT 2026 ===
