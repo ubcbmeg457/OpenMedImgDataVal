@@ -9,4 +9,5 @@ __pycache__/
 *.npz
 *.npy
 .DS_Store
+.env
 
