@@ -11,7 +11,7 @@ graph TD
     Train --> Embed["Extract Embeddings"]
     Embed --> SHAP["Data Valuation<br/>Shapley Values"]
     Embed --> OT["Data Valuation<br/>Optimal Transport"]
-    SHAP --> Retrain["Subset retraining<br/>Top/bottom/random-N data<br/>N = { 0.3, 0.5, 0.7, 0.8, 0.9 }"]
+    SHAP --> Retrain["Subset retraining<br/>Top/bottom/random-N data<br/>N = [0.3, 0.5, 0.7, 0.8, 0.9]"]
     OT --> Retrain
     Retrain --> Out["Outputs<br/>report, plots, CSVs, model"]
 ```
