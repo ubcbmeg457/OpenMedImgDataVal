@@ -5,3 +5,6 @@ DV labels: 3 tumor types (NCR, ED, ET)
 ============================================================
 SECTION 1: DATA DOWNLOAD & PREPROCESSING
 ============================================================
+BraTS 2023 data already exists at src/data/brats2023
+Training data directory: src/data/brats2023/Data
+Found 1 cases

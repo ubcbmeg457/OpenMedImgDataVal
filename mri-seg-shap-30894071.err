@@ -1,0 +1,29 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) CCconfig        6)  ucx/1.14.1         11) flexiblas/3.3.1
+  2) gentoo/2023     7)  libfabric/1.18.0   12) aocl-blas/5.1
+  3) gcccore/.12.3   8)  pmix/4.2.4         13) aocl-lapack/5.1
+  4) gcc/12.3        9)  ucc/1.2.0          14) StdEnv/2023
+  5) hwloc/2.9.1     10) openmpi/4.1.5
+Resolved 168 packages in 3ms
+Checked 163 packages in 62ms
+Traceback (most recent call last):
+  File "/scratch/jsiu/OpenMedImgDataVal/src/main.py", line 143, in <module>
+    main()
+  File "/scratch/jsiu/OpenMedImgDataVal/src/main.py", line 59, in main
+    _run_mri_segmentation(args)
+  File "/scratch/jsiu/OpenMedImgDataVal/src/main.py", line 139, in _run_mri_segmentation
+    run_pipeline(args, compute_shapley_values, "Shapley", _LazyMethodParams(args))
+  File "/scratch/jsiu/OpenMedImgDataVal/src/mri_seg/pipeline.py", line 209, in run_pipeline
+    _run_pipeline_inner(args, compute_values_fn, method_name, method_lower, method_params_report)
+  File "/scratch/jsiu/OpenMedImgDataVal/src/mri_seg/pipeline.py", line 234, in _run_pipeline_inner
+    raw_dir = download_dataset()
+              ^^^^^^^^^^^^^^^^^^
+  File "/scratch/jsiu/OpenMedImgDataVal/src/mri_seg/data.py", line 38, in download_dataset
+    syn.login()
+  File "/scratch/jsiu/OpenMedImgDataVal/.venv/lib/python3.11/site-packages/synapseclient/client.py", line 1001, in login
+    raise SynapseNoCredentialsError(
+synapseclient.core.exceptions.SynapseNoCredentialsError: No valid authentication credentials provided.
+Tried profile: 'default', email: 'N/A'.
+Check your `.synapseConfig` or ensure the provided auth token is valid.
