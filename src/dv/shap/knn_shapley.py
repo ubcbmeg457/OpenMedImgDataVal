@@ -21,6 +21,22 @@ import torch
 import torch.nn as nn
 
 
+def _inverse_frequency_weights(labels, eps=1e-8):
+    """Compute inverse-frequency class weights from binary label matrix.
+
+    Returns a 1-D tensor of shape [n_classes] where rare classes receive higher
+    weight, preventing the agreement metric from being dominated by the
+    majority class (e.g. "No Finding" in CXR-14).
+
+    Uses sqrt(1/freq) to moderate the correction — pure 1/freq can over-weight
+    ultra-rare classes (e.g. Hernia at ~0.2%) making valuation noisy.
+    """
+    freq = labels.float().mean(dim=0).clamp(min=eps)  # per-class positive rate
+    w = 1.0 / freq.sqrt()
+    w = w / w.sum() * float(w.numel())  # normalise so weights sum to n_classes
+    return w
+
+
 @torch.no_grad()
 def knn_accuracy(train_feats, train_y, val_feats, val_y, k):
     """Multi-label KNN accuracy: per-class majority vote, macro averaged."""
@@ -72,15 +88,19 @@ def knn_shapley_values_embeddings(train_feats, train_y, val_feats, val_y, k=10, 
     """
     Multi-label KNN-Shapley computation.
 
-    Agreement between training and validation labels is the mean per-class match,
-    giving a continuous score in [0, 1] that naturally extends the binary indicator
-    from Jia et al. 2019.
+    Agreement between training and validation labels uses inverse-frequency
+    weighted per-class matching, so that rare pathology classes contribute
+    proportionally more than the dominant majority class.
     """
     train_feats = nn.functional.normalize(train_feats, dim=1)
     val_feats = nn.functional.normalize(val_feats, dim=1)
 
     train_labels = train_y.round().to(torch.int64)
     val_labels = val_y.round().to(torch.int64)
+
+    # Compute class weights from the combined label distribution
+    all_labels = torch.cat([train_labels, val_labels], dim=0)
+    class_weights = _inverse_frequency_weights(all_labels)  # [n_classes]
 
     n_train = train_feats.size(0)
     n_val = val_feats.size(0)
@@ -116,10 +136,11 @@ def knn_shapley_values_embeddings(train_feats, train_y, val_feats, val_y, k=10, 
             Np = len(idx_sorted)
             K_eff = min(K, Np)
 
-            # Per-position agreement: per-class match rate (Hamming agreement)
+            # Weighted per-class agreement: rare classes count more
             a_lab = lab
             b_lab = y_val_j.unsqueeze(0)
-            agreement = (a_lab == b_lab).float().mean(dim=1).numpy()
+            match = (a_lab == b_lab).float()  # [Np, n_classes]
+            agreement = (match * class_weights.unsqueeze(0)).mean(dim=1).numpy()
 
             s_next = agreement[Np - 1] / float(Np)
             shapley[idx_sorted[Np - 1]] += s_next
