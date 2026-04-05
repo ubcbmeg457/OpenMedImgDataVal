@@ -3,7 +3,7 @@
 #SBATCH --account=def-timsbc
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
-#SBATCH --time=01:00:00
+#SBATCH --time=12:00:00
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 

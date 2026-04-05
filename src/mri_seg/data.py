@@ -2,6 +2,7 @@
 
 import glob
 import os
+import zipfile
 from pathlib import Path
 
 import nibabel as nib
@@ -42,6 +43,17 @@ def download_dataset(data_dir=None):
     print(f"Syncing BraTS 2023 (Synapse: {config.SYNAPSE_DATASET_ID})...")
     synapseutils.syncFromSynapse(syn, config.SYNAPSE_DATASET_ID, path=str(raw_dir))
     print(f"Sync complete: {config.rel(raw_dir)}")
+
+    # Extract GLI training data zip if not already extracted
+    gli_dir = raw_dir / "BraTS-GLI"
+    for zf in sorted(gli_dir.glob("*TrainingData*.zip")):
+        extract_dir = gli_dir / zf.stem
+        if not extract_dir.exists():
+            print(f"Extracting {zf.name}...")
+            with zipfile.ZipFile(zf, "r") as z:
+                z.extractall(gli_dir)
+            print(f"Extracted to {config.rel(gli_dir)}")
+
     return raw_dir
 
 
