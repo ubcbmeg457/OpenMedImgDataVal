@@ -136,11 +136,20 @@ def knn_shapley_values_embeddings(train_feats, train_y, val_feats, val_y, k=10, 
             Np = len(idx_sorted)
             K_eff = min(K, Np)
 
-            # Weighted per-class agreement: rare classes count more
+            # Weighted per-class agreement: only count classes where at least
+            # one sample has a positive label, so negative-negative matches
+            # on rare classes don't inflate agreement for "easy" samples.
             a_lab = lab
             b_lab = y_val_j.unsqueeze(0)
+            relevant = (a_lab + b_lab) > 0  # classes where either sample is positive
             match = (a_lab == b_lab).float()  # [Np, n_classes]
-            agreement = (match * class_weights.unsqueeze(0)).mean(dim=1).numpy()
+            # For relevant classes: 1 if match, 0 if mismatch
+            # For irrelevant classes (both negative): 0 (don't reward)
+            masked_match = match * relevant.float()
+            weighted = masked_match * class_weights.unsqueeze(0)  # [Np, n_classes]
+            # Normalize by number of relevant classes per training sample
+            n_relevant = relevant.float().sum(dim=1).clamp(min=1.0)
+            agreement = (weighted.sum(dim=1) / n_relevant).numpy()
 
             s_next = agreement[Np - 1] / float(Np)
             shapley[idx_sorted[Np - 1]] += s_next
