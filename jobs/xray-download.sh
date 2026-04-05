@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=xray-download
-#SBATCH --account=rrg-timsbc
+#SBATCH --account=def-timsbc
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
 #SBATCH --time=01:00:00
