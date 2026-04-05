@@ -11,12 +11,22 @@ set -euo pipefail
 
 PROJECT_DIR=~/scratch/OpenMedImgDataVal
 
+# ---------------------------------------------------------------------------
+# Modules
+# ---------------------------------------------------------------------------
 module purge
-module load gcc/12.3 python/3.11
+module load gcc/12.3 python/3.11 cuda/12.2 arrow/17.0.0
 
+# ---------------------------------------------------------------------------
+# Install dependencies (idempotent — skips if already up to date)
+# ---------------------------------------------------------------------------
 cd "$PROJECT_DIR"
 pip install --quiet uv
 uv sync --all-packages --all-extras
+
+# ---------------------------------------------------------------------------
+# Run
+# ---------------------------------------------------------------------------
 source "$PROJECT_DIR/.venv/bin/activate"
 
 # Delete old cache download
