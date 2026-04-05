@@ -1,0 +1,63 @@
+
+UPGRADE AVAILABLE
+
+A more recent version of the Synapse Client (4.12.0) is available. Your version (4.11.0) can be upgraded by typing:
+   pip install --upgrade synapseclient
+
+Python Synapse Client version 4.12.0 release notes
+
+https://python-docs.synapse.org/news/
+
+
+Welcome, jaidensiu!
+
+Syncing BraTS 2023 (Synapse: syn64952532)...
+[syn64952532:Data]: Syncing Folder from Synapse.
+[syn51514106:BraTS-MEN]: Syncing Folder from Synapse.
+[syn51514107:BraTS-MET]: Syncing Folder from Synapse.
+[syn51514109:BraTS-SSA]: Syncing Folder from Synapse.
+[syn51522870:BraTS-Local-Inpainting]: Syncing Folder from Synapse.
+[syn52276393:Sample Dataset MLCubes]: Syncing Folder from Synapse.
+[syn51514105:BraTS-GLI]: Syncing Folder from Synapse.
+[syn51514108:BraTS-PED]: Syncing Folder from Synapse.
+[syn68155505]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-SSA/README.md
+[syn68155922]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-MET/README.md
+[syn58633127]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-MEN/Meningioma supplementary clinical data and imaging parameters for training and validation sets.xlsx
+[syn68156593]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-Local-Inpainting/README.md
+[syn51930467]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-MEN/ASNR-MICCAI-BraTS2023-MEN-Challenge-ValidationData.zip
+[syn51718026]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-MEN/BraTS-MEN-TRAIN-FIX-V4.zip
+[syn51615438]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-GLI/BraTS2023_2017_GLI_Mapping.xlsx
+[syn51514055]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-MEN/ASNR-MICCAI-BraTS2023-MEN-Challenge-TrainingData.zip
+[syn51615054]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-PED/ASNR-MICCAI-BraTS2023-PED-Challenge-TrainingData.zip
+[syn51929861]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-PED/ASNR-MICCAI-BraTS2023-PED-Challenge-ValidationData.zip
+[syn51514132]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-GLI/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData.zip
+[syn51514110]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/BraTS-GLI/ASNR-MICCAI-BraTS2023-GLI-Challenge-ValidationData.zip
+[syn52276402]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/Sample Dataset MLCubes/BraTS-GLI-fastlane.tar.gz
+[syn52276405]: Downloaded to /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023/Sample Dataset MLCubes/BraTS-Local-Synthesis-fastlane.tar.gz
+Sync complete: src/data/brats2023
+Resolved path: /scratch/jsiu/OpenMedImgDataVal/src/data/brats2023
+
+=== Directory structure ===
+src/data
+src/data/datasets
+src/data/datasets/nih-chest-xrays
+src/data/datasets/nih-chest-xrays/data
+src/data/brats2023
+src/data/brats2023/BraTS-MEN
+src/data/brats2023/BraTS-SSA
+src/data/brats2023/BraTS-GLI
+src/data/brats2023/Sample Dataset MLCubes
+src/data/brats2023/BraTS-MET
+src/data/brats2023/BraTS-Local-Inpainting
+src/data/brats2023/BraTS-PED
+
+=== File counts per directory ===
+src/data/datasets/nih-chest-xrays/data: 1 files
+src/data/brats2023: 1 files
+src/data/brats2023/BraTS-MEN: 5 files
+src/data/brats2023/BraTS-SSA: 2 files
+src/data/brats2023/BraTS-GLI: 4 files
+src/data/brats2023/Sample Dataset MLCubes: 3 files
+src/data/brats2023/BraTS-MET: 2 files
+src/data/brats2023/BraTS-Local-Inpainting: 2 files
+src/data/brats2023/BraTS-PED: 3 files
