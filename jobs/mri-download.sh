@@ -33,7 +33,7 @@ source "$PROJECT_DIR/.venv/bin/activate"
 rm -rf src/data/brats2023
 
 # Download
-python -c "from src.mri_seg.data import download_dataset; path = download_dataset(); print(f'Resolved path: {path}')"
+PYTHONPATH=src python -c "from mri_seg.data import download_dataset; path = download_dataset(); print(f'Resolved path: {path}')"
 
 # Print the full directory structure
 echo ""

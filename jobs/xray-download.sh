@@ -33,7 +33,7 @@ source "$PROJECT_DIR/.venv/bin/activate"
 rm -rf src/data/datasets/nih-chest-xrays
 
 # Download
-python -c "from src.xray_class.data import download_dataset; path = download_dataset(); print(f'Resolved path: {path}')"
+PYTHONPATH=src python -c "from xray_class.data import download_dataset; path = download_dataset(); print(f'Resolved path: {path}')"
 
 # Print the directory structure
 echo ""
