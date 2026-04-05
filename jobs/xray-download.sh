@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH --job-name=xray-download
+#SBATCH --account=rrg-timsbc
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=8G
+#SBATCH --time=01:00:00
+#SBATCH --output=%x-%j.out
+#SBATCH --error=%x-%j.err
+
+set -euo pipefail
+
+PROJECT_DIR=~/scratch/OpenMedImgDataVal
+
+module purge
+module load gcc/12.3 python/3.11
+
+cd "$PROJECT_DIR"
+pip install --quiet uv
+uv sync --all-packages --all-extras
+source "$PROJECT_DIR/.venv/bin/activate"
+
+# Delete old cache download
+rm -rf src/data/datasets/nih-chest-xrays
+
+# Download
+python -c "from src.xray_class.data import download_dataset; path = download_dataset(); print(f'Resolved path: {path}')"
+
+# Print the directory structure
+echo ""
+echo "=== Directory structure ==="
+find src/data -type d
+
+echo ""
+echo "=== File counts per directory ==="
+find src/data -type d | while read d; do
+  count=$(find "$d" -maxdepth 1 -type f | wc -l)
+  if [ "$count" -gt 0 ]; then
+    echo "$d: $count files"
+  fi
+done

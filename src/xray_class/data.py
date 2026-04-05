@@ -14,11 +14,11 @@ from xray_class import config
 
 def download_dataset():
     """Download full NIH CXR14 via kagglehub. Returns the path to the dataset."""
-    # Set env var BEFORE importing kagglehub — it reads KAGGLE_CACHE_DIR at import time
-    os.environ["KAGGLE_CACHE_DIR"] = str(config.DEFAULT_DATA_DIR)
+    # Set env var BEFORE importing kagglehub — it reads KAGGLEHUB_CACHE at import time
+    os.environ["KAGGLEHUB_CACHE"] = str(config.DEFAULT_DATA_DIR)
     import kagglehub
 
-    print(f"KAGGLE_CACHE_DIR = {os.environ['KAGGLE_CACHE_DIR']}")
+    print(f"KAGGLEHUB_CACHE = {os.environ['KAGGLEHUB_CACHE']}")
     print(f"Downloading {config.KAGGLE_DATASET} via kagglehub...")
     path = kagglehub.dataset_download(config.KAGGLE_DATASET)
     print(f"Dataset path: {config.rel(path)}")

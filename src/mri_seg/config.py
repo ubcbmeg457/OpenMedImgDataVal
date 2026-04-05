@@ -7,7 +7,7 @@ _PROJECT_ROOT = _SRC_ROOT.parent
 
 DEFAULT_DATA_DIR = _SRC_ROOT / "data"
 
-SYNAPSE_DATASET_ID = "syn51156910"
+SYNAPSE_DATASET_ID = "syn64952532"
 
 # BraTS 2023 GLI tumor sub-regions (used as multi-label vector for data valuation)
 TUMOR_LABELS = {

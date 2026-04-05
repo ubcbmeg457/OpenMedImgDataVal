@@ -32,15 +32,6 @@ pip install --quiet uv
 uv sync --all-packages --all-extras
 
 # ---------------------------------------------------------------------------
-# Clean previous outputs to avoid stale caching
-# ---------------------------------------------------------------------------
-OUTPUT_DIR="$PROJECT_DIR/src/outputs/xray/class/ot"
-if [ -d "$OUTPUT_DIR" ]; then
-    echo "Removing old outputs: $OUTPUT_DIR"
-    rm -rf "$OUTPUT_DIR"
-fi
-
-# ---------------------------------------------------------------------------
 # Run the pipeline
 # ---------------------------------------------------------------------------
 source "$PROJECT_DIR/.venv/bin/activate"

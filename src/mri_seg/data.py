@@ -25,10 +25,6 @@ def download_dataset(data_dir=None):
     data_dir = Path(data_dir)
 
     raw_dir = data_dir / "brats2023"
-    if raw_dir.exists() and any(raw_dir.rglob(f"{config.SUBJECT_PREFIX}*")):
-        print(f"BraTS 2023 data already exists at {config.rel(raw_dir)}")
-        return raw_dir
-
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     import synapseclient
@@ -43,9 +39,9 @@ def download_dataset(data_dir=None):
     syn = synapseclient.Synapse()
     syn.login(authToken=auth_token)
 
-    print(f"Downloading BraTS 2023 (Synapse: {config.SYNAPSE_DATASET_ID})...")
+    print(f"Syncing BraTS 2023 (Synapse: {config.SYNAPSE_DATASET_ID})...")
     synapseutils.syncFromSynapse(syn, config.SYNAPSE_DATASET_ID, path=str(raw_dir))
-    print(f"Download complete: {config.rel(raw_dir)}")
+    print(f"Sync complete: {config.rel(raw_dir)}")
     return raw_dir
 
 
