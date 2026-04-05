@@ -1,3 +1,18 @@
+Removing old outputs: /home/jsiu/scratch/OpenMedImgDataVal/src/outputs/xray/class/ot
+=== Job 31037940 started on fc11001 at Fri Apr  3 05:12:32 PM PDT 2026 ===
+Python: Python 3.11.5
+PyTorch: 2.9.1+cu128
+CUDA available: False
+GPU: N/A
+
+============================================================
+OpenMedImgDataVal Pipeline
+============================================================
+  Modality : xray
+  Task     : class
+  DV Method: ot
+  Output   : /scratch/jsiu/OpenMedImgDataVal/src/outputs/xray/class/ot
+============================================================
 Device: cpu
 Classification: Multi-label (14 classes)
 
