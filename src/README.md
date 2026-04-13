@@ -4,7 +4,7 @@
 graph TD
     CMD["main.py<br/>--modality { xray, mri }<br/>--task { class, seg }<br/>--dv { shap, ot }"]
     CMD --> XRAY["X-ray Classification<br/>NIH CXR-14<br/>DenseNet121"]
-    CMD --> MRI["MRI Segmentation<br/>BraTS 2023 (sliced)<br/>U-Net"]
+    CMD --> MRI["MRI Segmentation<br/>BraTS 2023 (sliced)<br/>2D U-Net"]
     XRAY --> HPO["HPO<br/>Random search"]
     MRI --> HPO
     HPO --> Train["Model Training"]
@@ -31,7 +31,7 @@ src/
 ├── mri_seg/                 # MRI segmentation pipeline
 │   ├── config.py            # Sub-region labels, paths, constants
 │   ├── data.py              # BraTS dataset loader + 3D patch extraction
-│   ├── model.py             # 3D U-Net training, eval, embeddings
+│   ├── model.py             # 2D U-Net training, eval, embeddings
 │   └── pipeline.py          # Orchestrator (sections 1–6)
 └── dv/                      # Data valuation methods (reusable)
     ├── shap/knn_shapley.py  # KNN-Shapley (Jia et al. 2019)

@@ -29,7 +29,7 @@ Beyond model performance, data valuation is a **sustainability lever**. Training
 
 Core stack and libraries we use include:
 
-- [PyTorch](https://pytorch.org/) for deep learning (DenseNet121, 3D U-Net)
+- [PyTorch](https://pytorch.org/) for deep learning (DenseNet121, 2D U-Net)
 - [POT (Python Optimal Transport)](https://github.com/PythonOT/POT) for OT-based data valuation
 - [KaggleHub](https://github.com/Kaggle/kagglehub) / [Synapse](https://www.synapse.org/) for dataset downloads
 
@@ -124,7 +124,7 @@ OpenMedImgDataVal/
     ├── main.py                 # Unified entry point (--modality, --task, --dv)
     ├── pyproject.toml          # Pipeline dependencies
     ├── xray_class/             # X-ray classification (NIH CXR-14 + DenseNet121)
-    ├── mri_seg/                # MRI segmentation (BraTS 2023 + 3D U-Net)
+    ├── mri_seg/                # MRI segmentation (BraTS 2023 + 2D U-Net)
     ├── dv/                     # Reusable data valuation methods
     │   ├── shap/knn_shapley.py # KNN-Shapley (Jia et al. 2019)
     │   └── ot/sinkhorn.py      # Sinkhorn OT (POT library)
