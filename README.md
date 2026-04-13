@@ -14,10 +14,10 @@ This repository explores and benchmarks **robust, scalable, and context-aware da
 
 Our goal is to provide the community with open implementations and evaluations that enable:  
 
-* Efficient data curation for expensive annotation pipelines.  
-* Identification of mislabeled, redundant, or harmful samples.  
-* Task-aware data valuation for multi-task and medical ML models.  
-* Exploration of group-wise effects (synergistic or antagonistic).  
+- Efficient data curation for expensive annotation pipelines
+- Identification of mislabeled, redundant, or harmful samples
+- Task-aware data valuation for multi-task and medical ML models
+- Exploration of group-wise effects (synergistic or antagonistic)
 
 Ultimately, this project is about enabling **better models with less data** without compromising rigor or reproducibility.
 
@@ -29,9 +29,9 @@ Beyond model performance, data valuation is a **sustainability lever**. Training
 
 Core stack and libraries we use include:
 
-- [CodeCarbon](https://github.com/mlco2/codecarbon) for tracking CO2 emissions
-- [POT (Python Optimal Transport)](https://github.com/PythonOT/POT) for OT methods
-- [Giotto-TDA](https://github.com/giotto-ai/giotto-tda) for topological data analysis
+- [PyTorch](https://pytorch.org/) for deep learning (DenseNet121, 3D U-Net)
+- [POT (Python Optimal Transport)](https://github.com/PythonOT/POT) for OT-based data valuation
+- [KaggleHub](https://github.com/Kaggle/kagglehub) / [Synapse](https://www.synapse.org/) for dataset downloads
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -63,45 +63,29 @@ Install all dependencies:
 make setup
 ```
 
-### JupyterHub / HPC Setup
-
-On a cluster where JupyterHub is already running, you only need to install dependencies and register kernels:
-
-```sh
-make setup
-make kernel
-```
-
-This registers a named Jupyter kernel for each subproject (e.g. "Python (xray-shapley-nb)"). Open JupyterHub and select the
-kernel from the launcher or kernel picker.
-
-To register a single module:
-
-```sh
-make kernel MODULE=xray-shapley-nb
-```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
 
-### Running Notebooks
+### Running Pipelines
 
-Start Jupyter Lab locally for a specific pipeline:
-
-```sh
-make notebook MODULE=xray-shapley-nb
-make notebook MODULE=prototype
-```
-
-Or use the shortcuts:
+All pipelines are dispatched through a single entry point. The `--modality` and `--task` flags select the pipeline, and `--dv` selects the data valuation method.
 
 ```sh
-make notebook-xray-shapley-nb
-make notebook-prototype
+# X-ray classification with KNN-Shapley
+python src/main.py --modality xray --task class --dv shap
+
+# X-ray classification with Optimal Transport
+python src/main.py --modality xray --task class --dv ot
+
+# MRI segmentation with KNN-Shapley
+python src/main.py --modality mri --task seg --dv shap
+
+# MRI segmentation with Optimal Transport
+python src/main.py --modality mri --task seg --dv ot
 ```
 
-On JupyterHub, open the notebook file directly and select the registered kernel.
+For HPC clusters, see [jobs/README.md](jobs/README.md) for SLURM job scripts.
 
 ### Development
 
@@ -112,8 +96,7 @@ make clean     # Remove venvs, caches, and build artifacts
 make help      # Show all available targets
 ```
 
-See individual subproject READMEs for pipeline-specific documentation:
-- [xray-shapley-nb/README.md](xray-shapley-nb/README.md) — SHAP-based data valuation for chest X-ray classification (notebook)
+See [src/README.md](src/README.md) for pipeline architecture and [src/outputs/README.md](src/outputs/README.md) for output file documentation.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -129,25 +112,23 @@ We focus on publicly available datasets for reproducibility.
 
 ```
 OpenMedImgDataVal/
-├── Makefile                # Setup, notebooks, formatting, and cleanup
-├── pyproject.toml          # Root workspace config (uv + ruff)
-├── uv.lock                 # Locked dependencies for reproducibility
-├── .python-version         # Python version pin (3.11)
+├── Makefile                    # Setup, formatting, and cleanup
+├── pyproject.toml              # Root workspace config (uv + ruff)
+├── uv.lock                     # Locked dependencies for reproducibility
+├── .python-version             # Python version pin (3.11)
 │
-├── xray-shapley-nb/        # SHAP-based data valuation for chest X-rays (notebook)
-│   ├── pyproject.toml      # Subproject dependencies
-│   ├── xray_shapley.ipynb  # End-to-end pipeline notebook
-│   └── README.md           # Pipeline walkthrough and results
+├── docs/                       # Documentation and roadmap
+├── jobs/                       # SLURM batch scripts for HPC clusters
 │
-├── prototype/              # Prototyping and experimentation
-│   ├── pyproject.toml
-│   └── prototype.ipynb
-│
-├── mri-seg/                # MRI brain segmentation
-│   └── BRAINSEG.ipynb
-│
-├── docs/                   # Documentation and roadmap
-└── src/                    # Shared library code (planned)
+└── src/                        # Pipeline source code
+    ├── main.py                 # Unified entry point (--modality, --task, --dv)
+    ├── pyproject.toml          # Pipeline dependencies
+    ├── xray_class/             # X-ray classification (NIH CXR-14 + DenseNet121)
+    ├── mri_seg/                # MRI segmentation (BraTS 2023 + 3D U-Net)
+    ├── dv/                     # Reusable data valuation methods
+    │   ├── shap/knn_shapley.py # KNN-Shapley (Jia et al. 2019)
+    │   └── ot/sinkhorn.py      # Sinkhorn OT (POT library)
+    └── outputs/                # Generated outputs (per modality/task/method)
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -173,20 +154,20 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 
 Maintainer:
-* Dr. Rohit Singla, MD PhD — [LinkedIn](https://www.linkedin.com/in/rsingla92/) - rsingla [at] ece [dot] ubc [dot] ca
+- Dr. Rohit Singla, MD PhD — [LinkedIn](https://www.linkedin.com/in/rsingla92/) - rsingla [at] ece [dot] ubc [dot] ca
 
 Contributors:
-* Dhairya Aggarwal - [GitHub](https://github.com/DhairyaAggarwal02)
-* Chloe Christensen - [GitHub](https://github.com/Chloechristensen)
-* Jaiden Siu - [GitHub](https://github.com/jaidensiu)
-* Amy Yu - [GitHub](https://github.com/amyyu799)
+- Dhairya Aggarwal - [GitHub](https://github.com/DhairyaAggarwal02)
+- Chloe Christensen - [GitHub](https://github.com/Chloechristensen)
+- Jaiden Siu - [GitHub](https://github.com/jaidensiu)
+- Amy Yu - [GitHub](https://github.com/amyyu799)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Acknowledgments
 
-* Prof. Tim Salcudean for infrastructure support
-* The broader ML community for advancing research in data valuation
+- Prof. Tim Salcudean for infrastructure support
+- The broader ML community for advancing research in data valuation
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
