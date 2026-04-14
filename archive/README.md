@@ -6,8 +6,7 @@ Archive of experimental results, legacy scripts, and project documents. This dir
 
 ```
 archive/
-├── docs/                                                # Project documentation
-│   └── ubc_daid_2026_poster.pdf                         # UBC DAID 2026 conference poster
+├── docs/                                                # Project documentation/presentations
 │
 ├── mri-ot/                                              # MRI segmentation + Optimal Transport
 │   ├── results/                                         # Experiment outputs
