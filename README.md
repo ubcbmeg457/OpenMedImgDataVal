@@ -116,10 +116,8 @@ OpenMedImgDataVal/
 ├── pyproject.toml              # Root workspace config (uv + ruff)
 ├── uv.lock                     # Locked dependencies for reproducibility
 ├── .python-version             # Python version pin (3.11)
-│
-├── docs/                       # Documentation and roadmap
+├── archive/                    # Archived results and legacy scripts
 ├── jobs/                       # SLURM batch scripts for HPC clusters
-│
 └── src/                        # Pipeline source code
     ├── main.py                 # Unified entry point (--modality, --task, --dv)
     ├── pyproject.toml          # Pipeline dependencies

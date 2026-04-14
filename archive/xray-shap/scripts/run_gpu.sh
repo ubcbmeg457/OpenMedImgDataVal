@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=nih_dens_bin
+#SBATCH --job-name=nih_dens_bin_shap
 #SBATCH --account=st-rohling-1-gpu
 #SBATCH --partition=gpu
 
@@ -30,7 +30,7 @@ echo "Python: $(which python)"
 python -V
 
 # Run directory (where your script + caches live)
-RUN_DIR="/scratch/st-rohling-1/2025_capstone/final_runs/OT/"
+RUN_DIR="/scratch/st-rohling-1/2025_capstone/final_runs/Shapley/"
 
 # Redirect caches to scratch (compute nodes often restrict $HOME writes)
 export TORCH_HOME="${RUN_DIR}/.torch_cache"
@@ -54,6 +54,7 @@ OUT_DIR="${RUN_DIR}/out_${SLURM_JOB_ID}"
 # This path must already exist (downloaded previously); script will fail if missing
 PRETRAINED_PATH="/scratch/st-rohling-1/2025_capstone/xray_runs/run_001/.torch_cache/hub/checkpoints/densenet121-a639ec97.pth"
 
+
 mkdir -p "$OUT_DIR"
 
 echo "RUN_DIR: $RUN_DIR"
@@ -64,25 +65,27 @@ echo "TORCH_HOME: $TORCH_HOME"
 echo "CPUS: $SLURM_CPUS_PER_TASK"
 echo "MEM: 32G"
 echo "TIME: 36:00:00"
-   
-python "${RUN_DIR}/xray_densenet121_ot.py" \
+
+python "${RUN_DIR}/xray_densenet121_shap.py" \
   --data_root "$DATA_ROOT" \
   --out_dir "$OUT_DIR" \
-  --epochs 30 \
+  --epochs 300 \
   --batch_size 64 \
   --num_workers 16 \
   --early_stop_patience 5 \
   --use_scheduler \
-  --ot_reg 0.01 \
   --pretrained_path "$PRETRAINED_PATH" \
   --torch_home "$TORCH_HOME" \
   --dropout 0.4 \
   --freeze_backbone \
   --unfreeze_last_block \
-  --unfreeze_epoch 6 \
+  --unfreeze_epoch 100 \
   --head_lr 1e-3 \
   --finetune_lr 1e-4 \
   --weight_decay_head 0.0 \
-  --weight_decay_finetune 5e-4
+  --weight_decay_finetune 5e-4 \
+  --shapley_k 10 \
+  --shapley_mstar 2000 \
+  --shapley_batch_val 64
 
 echo "Finished at: $(date)"

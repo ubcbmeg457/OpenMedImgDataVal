@@ -11,7 +11,6 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split, Subset
 from torchvision import transforms, models
 
-import ot
 
 # matplotlib for plots (HPC-safe)
 import matplotlib
@@ -258,26 +257,104 @@ def evaluate_binary(model, loader, device, threshold=0.5):
     return avg_loss, acc, y_true, y_prob
 
 
-def ot_binary_row_normalized(train_feats, train_y, val_feats, val_y, reg=0.01, eps=1e-12):
+def knn_shapley_values_embeddings(
+    train_feats, train_y, val_feats, val_y,
+    k=10, m_star=5000, val_batch=32
+):
+    """
+    Compute (approx) KNN-Shapley values for training points using embeddings.
+
+    Utility per val point (test point):
+      U(S, x_val) = (1/K) * sum_{r=1..min(K,|S|)} I[y_{alpha_r(S)} == y_val]
+    Exact recursion (Jia et al. 2019):
+      s_{alpha_N} = I[y_{alpha_N}==y_val] / N
+      s_{alpha_i} = s_{alpha_{i+1}} +
+          ( I[y_{alpha_i}==y_val] - I[y_{alpha_{i+1}}==y_val] )/K * (min(K,i)/i)
+      (i is 1-indexed in the paper; here we implement carefully)
+
+    We average s over all val points to get one Shapley value per train point.
+
+    Approximation:
+      If m_star != -1, we only consider the top m_star nearest train points per val.
+      This is typically necessary for large train sets.
+    """
+    device = train_feats.device
     train_feats = nn.functional.normalize(train_feats, dim=1)
     val_feats = nn.functional.normalize(val_feats, dim=1)
 
-    C = 1.0 - (train_feats @ val_feats.T)  # [n_train, n_val]
-    R = (train_y.round() == val_y.T.round()).float()  # [n_train, n_val]
+    train_labels = train_y.view(-1).round().to(torch.int64)
+    val_labels = val_y.view(-1).round().to(torch.int64)
 
     n_train = train_feats.size(0)
     n_val = val_feats.size(0)
-    a = np.ones(n_train, dtype=np.float64) / n_train
-    b = np.ones(n_val, dtype=np.float64) / n_val
 
-    C_np = C.detach().cpu().numpy().astype(np.float64)
-    P = ot.sinkhorn(a, b, C_np, reg)
-    P = torch.tensor(P, dtype=torch.float32)  # CPU
+    # Accumulate shapley on CPU for memory stability
+    shapley = torch.zeros(n_train, dtype=torch.float64, device="cpu")
 
-    row_sums = P.sum(dim=1, keepdim=True).clamp_min(eps)
-    P_row = P / row_sums
-    scores = (P_row * R.detach().cpu()).sum(dim=1)  # [n_train]
-    return scores
+    # Decide effective M*
+    if m_star is None:
+        m_star = 5000
+    use_exact = (m_star == -1) or (m_star >= n_train)
+    M = n_train if use_exact else int(m_star)
+    K = int(k)
+
+    # Process val in batches for distance computation
+    for start in range(0, n_val, val_batch):
+        end = min(n_val, start + val_batch)
+        vb = val_feats[start:end]                    # [B, d]
+        yb = val_labels[start:end]                   # [B]
+
+        # cosine similarity = train @ val^T  (since normalized)
+        # [n_train, B]
+        sim = (train_feats @ vb.T).detach()
+
+        # For each val point, get ranking of train points by nearest (highest sim)
+        # Exact: full sort. Approx: topk.
+        if use_exact:
+            # argsort descending sim => nearest first
+            order = torch.argsort(sim, dim=0, descending=True)  # [n_train, B]
+        else:
+            # top M nearest only
+            _, order = torch.topk(sim, k=M, dim=0, largest=True, sorted=True)  # [M, B]
+
+        order_cpu = order.detach().cpu()  # indices into train
+        sim = None
+
+        # Compute shapley recursion for each val point independently
+        for j in range(order_cpu.size(1)):
+            idx_sorted = order_cpu[:, j].numpy()  # length N'=M or n_train
+            y_val = int(yb[j].item())
+
+            # labels along sorted train points (nearest -> farthest)
+            lab = train_labels[idx_sorted].detach().cpu().numpy()
+            Np = len(idx_sorted)
+
+            # Handle K bigger than Np
+            K_eff = min(K, Np)
+
+            # s for farthest point (alpha_N)
+            s_next = (1.0 if lab[Np - 1] == y_val else 0.0) / float(Np)
+
+            # Accumulate for farthest
+            shapley[idx_sorted[Np - 1]] += s_next
+
+            # Go backwards: i = Np-1 down to 1 in 1-indexed terms corresponds to pos = Np-2 down to 0
+            # Paper: s_{alpha_i} = s_{alpha_{i+1}} + (I_i - I_{i+1})/K * (min(K,i)/i)
+            # Here, i is 1-indexed position in sorted list.
+            for pos in range(Np - 2, -1, -1):
+                i_1idx = pos + 1  # 1..Np-1
+                I_i = 1.0 if lab[pos] == y_val else 0.0
+                I_ip1 = 1.0 if lab[pos + 1] == y_val else 0.0
+
+                coeff = (min(K_eff, i_1idx) / float(i_1idx)) / float(K_eff)
+                s_i = s_next + (I_i - I_ip1) * coeff
+
+                shapley[idx_sorted[pos]] += s_i
+                s_next = s_i
+
+    # Average over val points
+    shapley /= float(n_val)
+    return shapley.to(torch.float32).numpy()
 
 
 def plot_curve(x, y1, y2, label1, label2, title, xlabel, ylabel, out_path):
@@ -309,8 +386,8 @@ def plot_roc(fpr, tpr, auc_value, out_path):
 def plot_hist(values, out_path, bins=50):
     plt.figure()
     plt.hist(values, bins=bins)
-    plt.title("Histogram of OT Values (Train Samples)")
-    plt.xlabel("OT value")
+    plt.title("Histogram of Shapley Values (Train Samples)")
+    plt.xlabel("Shapley value")
     plt.ylabel("Count")
     plt.tight_layout()
     plt.savefig(out_path, dpi=200)
@@ -321,7 +398,7 @@ def plot_acc_vs_size(xs_pct, ys, title, out_path):
     plt.figure()
     plt.plot(xs_pct, ys, marker="o")
     plt.title(title)
-    plt.xlabel("Training data kept (%) (top OT)")
+    plt.xlabel("Training data kept (%) (top Shapley)")
     plt.ylabel("Accuracy")
     plt.xticks(xs_pct)
     plt.ylim(0.0, 1.0)
@@ -507,13 +584,22 @@ def main():
     parser.add_argument("--val_frac", type=float, default=0.1)
     parser.add_argument("--test_frac", type=float, default=0.1)
 
-    # OT
-    parser.add_argument("--ot_reg", type=float, default=0.01)
-
-    # OT-subset experiment fractions (train only)
-    parser.add_argument("--subset_fracs", type=str, default="0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.50,0.45,0.40,0.35,0.30,0.25,0.20,0.15,0.10,0.05,0.02,0.01")
+    # Split fractions for subset retraining (still needed)
+    parser.add_argument("--subset_fracs", type=str, default="0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.50,0.45,0.40,0.35,0.30,0.25,0.20,0.15,0.10,0.05,0.02,0.01",
+                    help="Fractions of training set to KEEP (top-valued samples).")
 
     parser.add_argument("--seed", type=int, default=42)
+
+    # =========================
+    # Shapley (KNN-Shapley on embeddings)
+    # =========================
+    parser.add_argument("--shapley_k", type=int, default=10,
+                        help="K for KNN-Shapley utility on embeddings.")
+    parser.add_argument("--shapley_mstar", type=int, default=5000,
+                        help="Approximation: only use top-M* nearest train points per val point. "
+                            "Set to -1 for exact (uses all train points; expensive).")
+    parser.add_argument("--shapley_batch_val", type=int, default=32,
+                        help="Val batch size used only for distance computation.")
 
     # =========================
     # NEW (from improved code)
@@ -634,7 +720,7 @@ def main():
     plot_roc(full_fpr, full_tpr, full_test_auc, roc_plot_path)
 
     # =========================
-    # 2) OT COMPUTATION (on train_set vs val_set)
+    # 2) SHAPLEY COMPUTATION (on train_set vs val_set)
     # IMPORTANT: use deterministic transforms for embeddings
     # =========================
     feature_model = models.densenet121(weights=None)
@@ -664,36 +750,47 @@ def main():
     train_embed_loader = DataLoader(train_set_eval_t, batch_size=args.batch_size, shuffle=False,
                                     num_workers=args.num_workers, pin_memory=True)
     val_embed_loader = DataLoader(val_set_t, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=args.num_workers, pin_memory=True)
+                                num_workers=args.num_workers, pin_memory=True)
 
     train_feats, train_y = get_embeddings_pooled(train_embed_loader)
     val_feats, val_y = get_embeddings_pooled(val_embed_loader)
 
-    ot_values = ot_binary_row_normalized(train_feats, train_y, val_feats, val_y, reg=args.ot_reg)
-    v = ot_values.numpy()
+    # ---- Shapley values on embeddings ----
+    m_star = args.shapley_mstar
+    if m_star == -1:
+        print("Shapley: exact mode (uses all train points per val) - may be very slow.")
+    else:
+        print(f"Shapley: approximate mode using top M*={m_star} nearest train points per val.")
 
-    ot_path = os.path.join(args.out_dir, "ot_values.npy")
-    np.save(ot_path, v)
+    v = knn_shapley_values_embeddings(
+        train_feats, train_y, val_feats, val_y,
+        k=args.shapley_k,
+        m_star=args.shapley_mstar,
+        val_batch=args.shapley_batch_val
+    ).astype(np.float64)
 
-    ot_hist_path = os.path.join(args.out_dir, "ot_histogram.png")
-    plot_hist(v, ot_hist_path, bins=50)
+    shap_path = os.path.join(args.out_dir, "shapley_values.npy")
+    np.save(shap_path, v)
+
+    shap_hist_path = os.path.join(args.out_dir, "shapley_histogram.png")
+    plot_hist(v, shap_hist_path, bins=50)
 
     # Map train order -> filenames
     train_indices = train_set.indices
     train_filenames = [dataset.filenames[i] for i in train_indices]
 
-    df_ot = pd.DataFrame({"ImageID": train_filenames, "OT_value": v.astype(np.float64)})
-    ot_csv_path = os.path.join(args.out_dir, "ot_values_with_ids.csv")
-    df_ot.to_csv(ot_csv_path, index=False)
+    df_shap = pd.DataFrame({"ImageID": train_filenames, "Shapley_value": v})
+    shap_csv_path = os.path.join(args.out_dir, "shapley_values_with_ids.csv")
+    df_shap.to_csv(shap_csv_path, index=False)
 
-    # Top/bottom 50 listing (for full train-set OT scores)
+    # Top/bottom 50 listing
     k50 = 50
     order_asc = np.argsort(v)
     bottom_idx = order_asc[:k50]
     top_idx = order_asc[-k50:][::-1]
 
     # =========================
-    # 3) OT SUBSET EXPERIMENTS
+    # 3) Shapley SUBSET EXPERIMENTS
     #    Train on top-X% OT of TRAIN SET only.
     #    Val/Test stay fixed.
     # =========================
@@ -703,8 +800,8 @@ def main():
         if not s:
             continue
         subset_fracs.append(float(s))
-    
-    # Sort OT descending indices for train_set order
+
+    # Sort Shapley descending indices for train_set order
     order_desc = np.argsort(v)[::-1]  # highest -> lowest, indices into train_set
 
     results_top = []
@@ -736,7 +833,7 @@ def main():
         n_keep = max(1, int(round(frac * len(train_set))))
 
         # -------------------------
-        # TOP-X% OT experiment
+        # TOP-X% Shapley experiment
         # -------------------------
         keep_top_indices = order_desc[:n_keep].tolist()
         train_subset_top = Subset(train_set, keep_top_indices)
@@ -778,9 +875,9 @@ def main():
             "best_path": top_best_path
         })
 
-        # -------------------------
-        # BOTTOM-X% OT experiment
-        # -------------------------
+        # ----------------------------
+        # BOTTOM-X% Shapley experiment
+        # ----------------------------
         keep_bottom_indices = order_desc[-n_keep:].tolist()
         train_subset_bottom = Subset(train_set, keep_bottom_indices)
 
@@ -825,8 +922,6 @@ def main():
     results_top = sorted(results_top, key=lambda d: d["frac"], reverse=True)
     results_bottom = sorted(results_bottom, key=lambda d: d["frac"], reverse=True)
 
-    
-
     # TOP plots
     xs_pct_top = [int(round(r["frac"] * 100)) for r in results_top]
     top_train_accs = [float(r["train_acc"]) for r in results_top]
@@ -837,9 +932,9 @@ def main():
     top_val_acc_plot = os.path.join(args.out_dir, "subset_top_val_accuracy_vs_size.png")
     top_test_acc_plot = os.path.join(args.out_dir, "subset_top_test_accuracy_vs_size.png")
 
-    plot_acc_vs_size(xs_pct_top, top_train_accs, "Train Accuracy vs Training Data Kept (Top OT)", top_train_acc_plot)
-    plot_acc_vs_size(xs_pct_top, top_val_accs, "Validation Accuracy vs Training Data Kept (Top OT)", top_val_acc_plot)
-    plot_acc_vs_size(xs_pct_top, top_test_accs, "Test Accuracy vs Training Data Kept (Top OT)", top_test_acc_plot)
+    plot_acc_vs_size(xs_pct_top, top_train_accs, "Train Accuracy vs Training Data Kept (Top Shapley)", top_train_acc_plot)
+    plot_acc_vs_size(xs_pct_top, top_val_accs, "Validation Accuracy vs Training Data Kept (Top Shapley)", top_val_acc_plot)
+    plot_acc_vs_size(xs_pct_top, top_test_accs, "Test Accuracy vs Training Data Kept (Top Shapley)", top_test_acc_plot)
 
     # BOTTOM plots
     xs_pct_bottom = [int(round(r["frac"] * 100)) for r in results_bottom]
@@ -851,9 +946,9 @@ def main():
     bottom_val_acc_plot = os.path.join(args.out_dir, "subset_bottom_val_accuracy_vs_size.png")
     bottom_test_acc_plot = os.path.join(args.out_dir, "subset_bottom_test_accuracy_vs_size.png")
 
-    plot_acc_vs_size(xs_pct_bottom, bottom_train_accs, "Train Accuracy vs Training Data Kept (Bottom OT)", bottom_train_acc_plot)
-    plot_acc_vs_size(xs_pct_bottom, bottom_val_accs, "Validation Accuracy vs Training Data Kept (Bottom OT)", bottom_val_acc_plot)
-    plot_acc_vs_size(xs_pct_bottom, bottom_test_accs, "Test Accuracy vs Training Data Kept (Bottom OT)", bottom_test_acc_plot)
+    plot_acc_vs_size(xs_pct_bottom, bottom_train_accs, "Train Accuracy vs Training Data Kept (Bottom Shapley)", bottom_train_acc_plot)
+    plot_acc_vs_size(xs_pct_bottom, bottom_val_accs, "Validation Accuracy vs Training Data Kept (Bottom Shapley)", bottom_val_acc_plot)
+    plot_acc_vs_size(xs_pct_bottom, bottom_test_accs, "Test Accuracy vs Training Data Kept (Bottom Shapley)", bottom_test_acc_plot)
 
     # Save subset results CSVs
     subset_top_csv_path = os.path.join(args.out_dir, "subset_results_top.csv")
@@ -880,7 +975,6 @@ def main():
         f.write(f"epochs_requested: {args.epochs}\n")
         f.write(f"batch_size: {args.batch_size}\n")
         f.write(f"early_stop_patience (val_auc no-improve): {args.early_stop_patience}\n")
-        f.write(f"ot_reg: {args.ot_reg}\n")
         f.write(f"pretrained_path: {args.pretrained_path}\n")
         f.write(f"seed: {args.seed}\n\n")
 
@@ -902,24 +996,25 @@ def main():
         f.write(f"Val:   loss={full_val_loss:.6f}, acc@0.5={full_val_acc:.6f}, auc={full_val_auc:.6f}, best_thr={full_val_best_thr:.6f}\n")
         f.write(f"Test:  loss={full_test_loss:.6f}, acc@0.5={full_test_acc:.6f}, auc={full_test_auc:.6f}\n\n")
 
-        f.write("=== OT VALUES SUMMARY (train samples) ===\n")
-        f.write(f"OT shape: {v.shape}\n")
+        f.write("=== Shapley VALUES SUMMARY (train samples) ===\n")
+        f.write(f"Shapley shape: {v.shape}\n")
         f.write(f"min: {float(v.min()):.10f}\n")
         f.write(f"max: {float(v.max()):.10f}\n")
         f.write(f"mean: {float(v.mean()):.10f}\n")
         f.write(f"std: {float(v.std()):.10f}\n\n")
 
-        f.write("=== TOP 50 OT SAMPLES (TRAIN SET) ===\n")
-        f.write("Rank\tOT_value\tImageID\n")
+        f.write("=== TOP 50 Shapley SAMPLES (TRAIN SET) ===\n")
+        f.write("Rank\tShapley_value\tImageID\n")
         for rank, idx in enumerate(top_idx, start=1):
             f.write(f"{rank}\t{float(v[idx]):.10f}\t{train_filenames[idx]}\n")
 
-        f.write("\n=== BOTTOM 50 OT SAMPLES (TRAIN SET) ===\n")
-        f.write("Rank\tOT_value\tImageID\n")
+        f.write("\n=== BOTTOM 50 Shapley SAMPLES (TRAIN SET) ===\n")
+        f.write("Rank\tShapley_value\tImageID\n")
         for rank, idx in enumerate(bottom_idx, start=1):
             f.write(f"{rank}\t{float(v[idx]):.10f}\t{train_filenames[idx]}\n")
 
-        f.write("\n=== OT SUBSET EXPERIMENTS: TOP OT% ===\n")
+    
+        f.write("\n=== Shapley SUBSET EXPERIMENTS: TOP Shapley% ===\n")
         f.write("Kept%\tN_train\tTrainLoss\tTrainAcc\tValLoss\tValAcc\tValAUC\tValBestThr\tTestLoss\tTestAcc\tTestAUC\tBestEpoch\tBestValAUC\n")
         for r in results_top:
             kept = int(round(r["frac"] * 100))
@@ -932,7 +1027,7 @@ def main():
                 f"{float(r['test_auc']):.6f}\t{int(r['best_epoch'])}\t{float(r.get('best_val_auc', np.nan)):.6f}\n"
             )
 
-        f.write("\n=== OT SUBSET EXPERIMENTS: BOTTOM OT% ===\n")
+        f.write("\n=== Shapley SUBSET EXPERIMENTS: BOTTOM Shapley% ===\n")
         f.write("Kept%\tN_train\tTrainLoss\tTrainAcc\tValLoss\tValAcc\tValAUC\tValBestThr\tTestLoss\tTestAcc\tTestAUC\tBestEpoch\tBestValAUC\n")
         for r in results_bottom:
             kept = int(round(r["frac"] * 100))
@@ -945,23 +1040,25 @@ def main():
                 f"{float(r['test_auc']):.6f}\t{int(r['best_epoch'])}\t{float(r.get('best_val_auc', np.nan)):.6f}\n"
             )
 
+
+
         f.write("\n=== OUTPUT FILES ===\n")
         f.write(f"Model (full best): {full_best_path}\n")
         f.write(f"Model (full final state): {model_path}\n")
-        f.write(f"OT values (npy): {ot_path}\n")
-        f.write(f"OT values + IDs (csv): {ot_csv_path}\n")
+        f.write(f"Shapley values (npy): {shap_path}\n")
+        f.write(f"Shapley values + IDs (csv): {shap_csv_path}\n")
+        f.write(f"Shapley histogram: {shap_hist_path}\n")
         f.write(f"Subset results TOP (csv): {subset_top_csv_path}\n")
         f.write(f"Subset results BOTTOM (csv): {subset_bottom_csv_path}\n")
+        f.write(f"Loss plot (epoch, full): {loss_plot_path}\n")
+        f.write(f"Accuracy plot (epoch, full): {acc_plot_path}\n")
+        f.write(f"ROC plot (test, full): {roc_plot_path}\n")
         f.write(f"Top train acc vs size: {top_train_acc_plot}\n")
         f.write(f"Top val acc vs size: {top_val_acc_plot}\n")
         f.write(f"Top test acc vs size: {top_test_acc_plot}\n")
         f.write(f"Bottom train acc vs size: {bottom_train_acc_plot}\n")
         f.write(f"Bottom val acc vs size: {bottom_val_acc_plot}\n")
         f.write(f"Bottom test acc vs size: {bottom_test_acc_plot}\n")
-        f.write(f"Loss plot (epoch, full): {loss_plot_path}\n")
-        f.write(f"Accuracy plot (epoch, full): {acc_plot_path}\n")
-        f.write(f"ROC plot (test, full): {roc_plot_path}\n")
-        f.write(f"OT histogram: {ot_hist_path}\n")
         f.write(f"Report: {report_path}\n")
 
     print("\n=== DONE ===")
